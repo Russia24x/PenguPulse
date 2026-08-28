@@ -116,9 +116,8 @@ export class ChainError extends Error {
 
 const MIN_WEI = parseUnits(MIN_PAYMENT, PENGU.decimals);
 
-/** انقضا: برای تعرفه‌های دائمی (ثبت‌نام) عملاً بی‌پایان است */
+/** انقضا = زمان پرداخت + مدت تعرفه (همهٔ تعرفه‌ها زمان‌دارند؛ تعرفهٔ دائمی حذف شده است) */
 function expiresFor(plan: Plan, grantedAtSec: number): number {
-  if (plan.permanent) return grantedAtSec + 365 * 24 * 3600 * 100; // ~100 سال
   return grantedAtSec + plan.hours * 3600;
 }
 

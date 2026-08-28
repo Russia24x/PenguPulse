@@ -53,29 +53,36 @@ export interface Plan {
   id: PlanId;
   /** قیمت به واحد PENGU */
   price: string;
-  /** مدت اعتبار (ساعت)؛ 0 = دائمی */
+  /** مدت اعتبار (ساعت) */
   hours: number;
   /** سطح دسترسی: 1 = ترمینال بازار (بدون سیگنال)، 2 = کامل با سیگنال */
   tier: 1 | 2;
-  /** دائمی (یک‌بار پرداخت، برای همیشه) */
-  permanent?: boolean;
+  /** درصد تخفیف نسبت به نرخ پایه (فقط نمایشی) */
+  discount?: number;
   /** اشتراک (با یادآوری تمدید خودکار) */
   subscription?: boolean;
   popular?: boolean;
 }
 
+/**
+ * نرخ پایه: روزانه ۱۰ PENGU برای ورود (بدون سیگنال)؛ سیگنال کامل ۲× نرخ پایه.
+ * تخفیف پلکانی: ۰٪ / ۱۰٪ / ۲۰٪ / ۳۰٪ — سقف تخفیف ۳۰٪.
+ * همهٔ اعداد صحیح‌اند: 70×0.9=63 · 140×0.9=126 · 300×0.8=240 · 600×0.8=480 · 3650×0.7=2555 · 7300×0.7=5110
+ */
+export const DAILY_BASE = 10;
+
 export const PLANS: Plan[] = [
-  { id: "signup", price: "10", hours: 0, tier: 1, permanent: true },
-  { id: "signal", price: "5", hours: 24, tier: 2 },
-  { id: "week", price: "30", hours: 24 * 7, tier: 2, subscription: true, popular: true },
-  { id: "month", price: "100", hours: 24 * 30, tier: 2, subscription: true },
-  { id: "year", price: "1500", hours: 24 * 365, tier: 2, subscription: true },
+  { id: "signup", price: "10", hours: 24, tier: 1 },
+  { id: "signal", price: "20", hours: 24, tier: 2 },
+  { id: "week", price: "126", hours: 24 * 7, tier: 2, discount: 10, subscription: true },
+  { id: "month", price: "480", hours: 24 * 30, tier: 2, discount: 20, subscription: true, popular: true },
+  { id: "year", price: "5110", hours: 24 * 365, tier: 2, discount: 30, subscription: true },
 ];
 
 export const planById = (id: PlanId): Plan => PLANS.find((p) => p.id === id)!;
 
 /** حداقل مبلغ برای به‌رسمیت‌شناختن یک تراکنش به‌عنوان پرداخت (جلوگیری از اسپم) */
-export const MIN_PAYMENT = "5";
+export const MIN_PAYMENT = "10";
 
 /* ------------------------------------------------------------------ */
 /* کشف خودکار دسترسی از زنجیره (بدون نیاز به هش یا ذخیرهٔ محلی)          */

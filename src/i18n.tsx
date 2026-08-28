@@ -127,6 +127,8 @@ export interface Dict {
     featureFull: string[];
     autoRenew: string;
     autoRenewHint: string;
+    discount: (n: number) => string;
+    baseRate: string;
   };
   pay: {
     title: string;
@@ -260,8 +262,8 @@ const fa: Dict = {
     title1: "ترمینال سیگنال",
     title2: "پنگو",
     lead: "هشت اندیکاتور کلاسیک، دو تایم‌فریم، یک امتیاز ریاضی شفاف — سیگنال خرید/فروش $PENGU از دل دادهٔ واقعی بازار؛ دسترسی با پرداخت PENGU و تأیید مستقیم روی زنجیره.",
-    ctaSignal: "سیگنال امروز — ۵ PENGU",
-    ctaFull: "ثبت‌نام — ۱۰ PENGU",
+    ctaSignal: "سیگنال امروز — ۲۰ PENGU",
+    ctaFull: "ورود بدون سیگنال — ۱۰ PENGU",
     scroll: "ورود به ترمینال",
   },
   gauge: {
@@ -329,7 +331,7 @@ const fa: Dict = {
     title: "تعرفه‌ها — پرداخت مستقیم با PENGU",
     body: "هر پرداخت یک انتقال مستقیم ERC-20 روی Abstract به خزانهٔ عمومی پروژه است؛ رسید تراکنش همان لحظه روی زنجیره راستی‌آزمایی می‌شود و دسترسی را باز می‌کند. بدون Session Key و بدون هیچ اجازهٔ برداشت خودکار.",
     signup: "ثبت‌نام و ورود",
-    signupDesc: "یک‌بار پرداخت، برای همیشه — ترمینال بازار بدون سیگنال",
+    signupDesc: "ترمینال بازار بدون سیگنال — ۲۴ ساعت",
     signal: "سیگنال امروز",
     signalDesc: "دسترسی ۲۴ ساعته به سیگنال کامل روزانه",
     week: "دسترسی ۷ روزه",
@@ -351,6 +353,8 @@ const fa: Dict = {
     featureFull: ["همهٔ ۸ اندیکاتور در ۲ تایم‌فریم", "سطوح حمایت/مقاومت و ATR", "حد ضررهای پیشنهادی", "هش داده و نسخهٔ موتور", "تمدید یک‌کلیکی"],
     autoRenew: "تمدید خودکار",
     autoRenewHint: "با فعال‌کردن، هنگام انقضای دسترسی پرداخت با یک کلیک از همین‌جا آغاز می‌شود (بدون هیچ برداشت خودکار از کیف پول).",
+    discount: (n: number) => `${n}٪ تخفیف`,
+    baseRate: "نرخ پایه: روزانه ۱۰ PENGU — سیگنال کامل ۲× نرخ پایه، با تخفیف پلکانی تا سقف ۳۰٪",
   },
   pay: {
     title: "پرداخت روی Abstract",
@@ -509,8 +513,8 @@ const en: Dict = {
     title1: "The Pengu",
     title2: "Signal Terminal",
     lead: "Eight classic indicators, two timeframes, one transparent math score — a buy/sell signal for $PENGU straight from real market data; unlocked with PENGU payments verified directly on-chain.",
-    ctaSignal: "Today's signal — 5 PENGU",
-    ctaFull: "Sign-up — 10 PENGU",
+    ctaSignal: "Today's signal — 20 PENGU",
+    ctaFull: "Entry without signal — 10 PENGU",
     scroll: "Enter the terminal",
   },
   gauge: {
@@ -578,7 +582,7 @@ const en: Dict = {
     title: "Pricing — pay in PENGU, on Abstract",
     body: "Every payment is a direct ERC-20 transfer on Abstract to the project's public treasury; the receipt is verified on-chain the moment it lands and unlocks access. No session keys, no automatic withdrawal allowance.",
     signup: "Sign-up & entry",
-    signupDesc: "Pay once, forever — market terminal without signals",
+    signupDesc: "Market terminal without signals — 24 hours",
     signal: "Today's signal",
     signalDesc: "24-hour access to the full daily signal",
     week: "7-day access",
