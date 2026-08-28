@@ -160,7 +160,7 @@ export const fmt = {
 };
 
 export type Lang = "fa" | "en" | "es" | "hi" | "zh" | "ja" | "ko" | "de" | "fr" | "ru";
-export const DEFAULT_LANG: Lang = "fa";
+export const DEFAULT_LANG: Lang = "en";
 
 /** زبان‌های راست‌به‌چپ */
 export const RTL_LANGS: Lang[] = ["fa"];

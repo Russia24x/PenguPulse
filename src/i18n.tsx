@@ -724,7 +724,7 @@ interface I18nCtx {
   dir: "rtl" | "ltr";
 }
 
-const Ctx = createContext<I18nCtx>({ lang: DEFAULT_LANG, setLang: () => {}, t: DICTS[DEFAULT_LANG], dir: "rtl" });
+const Ctx = createContext<I18nCtx>({ lang: DEFAULT_LANG, setLang: () => {}, t: DICTS[DEFAULT_LANG], dir: "ltr" });
 
 const SUPPORTED = Object.keys(DICTS) as Lang[];
 
