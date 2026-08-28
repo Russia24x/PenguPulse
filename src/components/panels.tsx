@@ -326,7 +326,7 @@ export function Footer() {
     <footer className="relative border-t border-line/70 bg-ink/60">
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-14 md:grid-cols-3">
         <div>
-          <p className="font-display text-2xl text-snow">{APP.name} <span className="text-beak">•</span> {APP.nameEn}</p>
+          <p className="font-display text-2xl text-snow">{t.meta.appName} <span className="text-beak">•</span> PENGU PULSE</p>
           <p className="mt-3 max-w-xs text-[13px] leading-7 text-fog">{t.meta.tagline}</p>
           <p className="mt-4 flex items-center gap-2 font-mono text-[12px] text-ice">
             <IcChain size={15} /> {t.footer.built}

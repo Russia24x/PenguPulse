@@ -48,9 +48,6 @@ function BootStrip({ wallet, blockNum, dataHash, stale }: { wallet: WalletApi; b
   );
 }
 
-/* -------------------------------- Spark ---------------------------------
- * اسپارک‌لاین کوچک از آخرین بسته‌شدن‌های کندل
- */
 /* ------------------------------ LangPicker ------------------------------
  * انتخاب‌گر ۱۰ زبانه با نام بومی هر زبان؛ جهت صفحه خودکار تغییر می‌کند.
  */
@@ -107,7 +104,7 @@ function Spark({ values, tone }: { values: number[]; tone: "gain" | "loss" | "ic
 }
 
 function AppInner() {
-  const { t, lang, setLang } = useI18n();
+  const { t, lang } = useI18n();
   const wallet = useWallet();
 
   const [market, setMarket] = useState<MarketState>({ status: "loading", bundle: null });
@@ -251,8 +248,8 @@ function AppInner() {
             <a href="#signal" className="flex items-center gap-3">
               <PenguLogo size={38} />
               <span className="leading-none">
-                <span className="block font-display text-[21px] text-snow">{APP.name}</span>
-                <span className="block font-mono text-[10.5px] tracking-[0.3em] text-ice">{APP.nameEn} · ABS</span>
+                <span className="block font-display text-[21px] text-snow">{t.meta.appName}</span>
+                <span className="block font-mono text-[10.5px] tracking-[0.3em] text-ice">PENGU PULSE · ABS</span>
               </span>
             </a>
             <nav className="hidden items-center gap-6 text-[13.5px] font-semibold text-fog lg:flex">
@@ -264,13 +261,7 @@ function AppInner() {
               <a href="#method" className="transition-colors hover:text-beak">{t.nav.method}</a>
             </nav>
             <div className="flex items-center gap-2.5">
-              <button
-                onClick={() => setLang(lang === "fa" ? "en" : "fa")}
-                className="btn-press flex items-center gap-1.5 rounded-lg border border-line bg-panel px-3 py-2.5 text-[12.5px] font-bold text-fog hover:border-ice/50 hover:text-ice"
-                title={t.status.langToggle}
-              >
-                <IcGlobe size={15} /> {t.status.langToggle}
-              </button>
+              <LangPicker />
               <WalletButton wallet={wallet} notify={notify} />
             </div>
           </div>
