@@ -16,9 +16,11 @@ import {
   explorerAddr,
   explorerTx,
   fetchPenguBalance,
+  fetchTreasuryFeed,
   readAutoRenew,
   saveGrantFor,
   sendPaymentViaAgw,
+  type TreasuryInflow,
   verifyTxHash,
   writeAutoRenew,
   type AccessGrant,
@@ -661,6 +663,66 @@ export function AccessCard({
       ) : (
         <p className="mt-3 text-[13px] leading-6 text-fog">{t.access.noneBody}</p>
       )}
+    </div>
+  );
+}
+
+/* ------------------------------- TreasuryFeed ---------------------------
+ * فید زندهٔ پرداخت‌های خزانه — فقط دادهٔ عمومی زنجیره
+ */
+export function TreasuryFeed() {
+  const { t, lang } = useI18n();
+  const [rows, setRows] = useState<TreasuryInflow[] | null>(null);
+
+  useEffect(() => {
+    let stop = false;
+    const load = () => fetchTreasuryFeed(8).then((r) => !stop && setRows(r)).catch(() => {});
+    load();
+    const iv = setInterval(load, 60_000);
+    return () => {
+      stop = true;
+      clearInterval(iv);
+    };
+  }, []);
+
+  return (
+    <div className="corners relative mt-8 max-w-3xl rounded-2xl border border-line bg-ink/70 p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="flex items-center gap-2 font-display text-xl text-snow">
+          <IcChain size={20} className="text-ice" /> {t.feed.title}
+        </h3>
+        <span className="flex items-center gap-1.5 font-mono text-[11px] text-faint">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="pp-ping absolute h-full w-full rounded-full bg-gain" />
+            <span className="relative h-1.5 w-1.5 rounded-full bg-gain" />
+          </span>
+          60s
+        </span>
+      </div>
+      {rows === null ? (
+        <div className="flex items-center gap-3 py-6 text-fog">
+          <span className="pp-spin inline-block h-5 w-5 rounded-full border-2 border-line border-t-ice" />
+          <span className="font-mono text-[12px]">{t.verify.working}</span>
+        </div>
+      ) : rows.length === 0 ? (
+        <p className="py-4 font-mono text-[12.5px] text-faint">{t.feed.empty}</p>
+      ) : (
+        <ul className="divide-y divide-line/60" dir="ltr">
+          {rows.map((r) => (
+            <li key={r.txHash + String(r.blockNumber)} className="flex items-center justify-between gap-3 py-2.5 font-mono text-[12px]">
+              <a href={explorerAddr(r.from)} target="_blank" rel="noreferrer" className="text-fog transition-colors hover:text-frost">
+                {fmt.addr(r.from)}
+              </a>
+              <span className="font-bold text-beak tabular">{fmt.pengu(r.value)} {PENGU.symbol}</span>
+              <span className="hidden text-faint sm:inline tabular">#{r.blockNumber.toLocaleString("en-US")}</span>
+              <a href={explorerTx(r.txHash)} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-ice transition-colors hover:text-frost">
+                tx <IcExternal size={12} />
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="mt-3 text-[11.5px] leading-5 text-faint">{t.feed.note}</p>
     </div>
   );
 }

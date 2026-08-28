@@ -130,6 +130,7 @@ export const fr: Dict = {
     dailySignal: "Signal du jour", dailyBody: "5 PENGU pour 24 h de signal quotidien — la façon la plus légère d'essayer le moteur.",
     dailyReset: "Réinitialisation quotidienne (UTC)", unlock: "Débloquer pour {n} PENGU", otherPlans: "Autres plans et abonnements",
   },
+  feed: { title: "Flux trésorerie en direct", empty: "Aucun paiement dans la fenêtre scannée", note: "Journaux Transfer publics vers la trésorerie — données on-chain, rafraîchies toutes les 60 s" },
   toast: { copied: "Copié", paid: "Paiement confirmé — accès actif", verified: "Transaction valide — accès restauré", payFail: "Échec du paiement", renewed: "Renouvelé avec succès" },
 };
 
@@ -260,5 +261,6 @@ export const ru: Dict = {
     dailySignal: "Сигнал на сегодня", dailyBody: "5 PENGU за 24 часа дневного сигнала — самый лёгкий способ попробовать движок.",
     dailyReset: "Ежедневный сброс (UTC)", unlock: "Открыть за {n} PENGU", otherPlans: "Другие тарифы и подписки",
   },
+  feed: { title: "Живой поток казны", empty: "Нет платежей в окне сканирования", note: "Публичные логи Transfer в казну проекта — он-чейн данные, обновление каждые 60 с" },
   toast: { copied: "Скопировано", paid: "Платёж подтверждён — доступ активен", verified: "Валидная транзакция — доступ восстановлен", payFail: "Оплата не прошла", renewed: "Продлено успешно" },
 };

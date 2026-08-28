@@ -130,6 +130,7 @@ export const ko: Dict = {
     dailySignal: "오늘의 시그널", dailyBody: "5 PENGU로 일간 시그널 24시간 액세스 — 엔진을 시험하는 가장 가벼운 방법.",
     dailyReset: "매일 초기화 (UTC)", unlock: "{n} PENGU로 잠금 해제", otherPlans: "기타 플랜과 구독",
   },
+  feed: { title: "라이브 재무 스트림", empty: "스캔 구간에 결제 없음", note: "재무 주소로 전송된 공개 Transfer 로그 — 온체인 데이터, 60초마다 새로고침" },
   toast: { copied: "복사됨", paid: "결제 확인 — 액세스 활성화", verified: "유효한 거래 — 액세스 복원", payFail: "결제 실패", renewed: "성공적으로 갱신됨" },
 };
 
@@ -260,5 +261,6 @@ export const de: Dict = {
     dailySignal: "Heutiges Signal", dailyBody: "5 PENGU für 24 Stunden Tagessignal — der leichteste Weg, die Engine zu testen.",
     dailyReset: "Täglicher Reset (UTC)", unlock: "Freischalten für {n} PENGU", otherPlans: "Weitere Pläne & Abos",
   },
+  feed: { title: "Live-Treasury-Stream", empty: "Keine Zahlungen im Scan-Fenster", note: "Öffentliche Transfer-Logs an die Projektkasse — On-Chain-Daten, alle 60 s aktualisiert" },
   toast: { copied: "Kopiert", paid: "Zahlung bestätigt — Zugang aktiv", verified: "Gültige Transaktion — Zugang wiederhergestellt", payFail: "Zahlung fehlgeschlagen", renewed: "Erfolgreich verlängert" },
 };

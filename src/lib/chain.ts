@@ -331,6 +331,43 @@ export async function discoverOnChainAccess(user: Address, onState?: (s: ScanSta
   }
 }
 
+/* --------------------------- فید زندهٔ خزانه ----------------------------
+ * اسکن عمومی لاگ‌های Transfer(→ خزانه) بدون فیلتر فرستنده؛ برای نمایش
+ * شفاف پرداخت‌های اخیر — دادهٔ کاملاً عمومی و قابل راستی‌آزمایی.
+ */
+export interface TreasuryInflow {
+  from: Address;
+  value: bigint;
+  txHash: Hash;
+  blockNumber: bigint;
+}
+
+export async function fetchTreasuryFeed(limit = 8): Promise<TreasuryInflow[]> {
+  const head = await publicClient.getBlockNumber();
+  const from = head > BigInt(AUTO_SCAN.blocks) ? head - BigInt(AUTO_SCAN.blocks) : 0n;
+  try {
+    const logs = await publicClient.getLogs({
+      address: tokenAddress,
+      event: TRANSFER_EVENT,
+      args: { to: treasuryAddress },
+      fromBlock: from,
+      toBlock: "latest",
+    });
+    return logs
+      .filter((l) => l.args.from && l.args.value !== undefined)
+      .slice(-limit)
+      .reverse()
+      .map((l) => ({
+        from: l.args.from as Address,
+        value: l.args.value as bigint,
+        txHash: l.transactionHash as Hash,
+        blockNumber: l.blockNumber ?? 0n,
+      }));
+  } catch {
+    return [];
+  }
+}
+
 /* --------------------------- پروفایل Portal ----------------------------
  * خواندن پروفایل عمومی کاربر از API رسمی Abstract Portal (اختیاری؛
  * اگر API در دسترس نبود، بدون خطا نادیده گرفته می‌شود).
