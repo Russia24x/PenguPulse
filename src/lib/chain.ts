@@ -24,7 +24,7 @@ import {
 } from "viem";
 import { abstract } from "viem/chains";
 import type { AbstractClient } from "@abstract-foundation/agw-client";
-import { ABSTRACT, MIN_PAYMENT, PENGU, PLANS, TREASURY, type Plan, type PlanId } from "../config";
+import { ABSTRACT, AUTO_SCAN, ECOSYSTEM, MIN_PAYMENT, PENGU, PLANS, TREASURY, type Plan, type PlanId } from "../config";
 
 /** زنجیرهٔ استاندارد Abstract از viem — همان چیزی که AGW استفاده می‌کند */
 export { abstract as abstractChain };
@@ -259,6 +259,119 @@ export function verifyTxHash(raw: string): Promise<VerifyResult> {
   const hash = raw.trim();
   if (!/^0x[a-fA-F0-9]{64}$/.test(hash)) return Promise.reject(new ChainError("INVALID_HASH"));
   return grantFromHash(hash as Hash);
+}
+
+/* -------------------- کشف خودکار دسترسی از زنجیره ----------------------
+ * بدون نیاز به هش یا ذخیرهٔ محلی: لاگ‌های Transfer(user → treasury) روی
+ * توکن PENGU در بازهٔ بلوکی اخیر اسکن و مستقیم به AccessGrant تبدیل می‌شوند.
+ */
+import { parseAbiItem } from "viem";
+
+const TRANSFER_EVENT = parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 value)");
+
+export type ScanState = "idle" | "scanning" | "done" | "error";
+
+async function scanRange(user: Address, fromBlock: bigint): Promise<AccessGrant[]> {
+  const logs = await publicClient.getLogs({
+    address: tokenAddress,
+    event: TRANSFER_EVENT,
+    args: { from: user, to: treasuryAddress },
+    fromBlock,
+    toBlock: "latest",
+  });
+  const out: AccessGrant[] = [];
+  for (const log of logs) {
+    const value = log.args.value;
+    if (!value || value < MIN_WEI) continue;
+    const plan = inferPlan(value);
+    if (!plan || !log.blockNumber || !log.transactionHash) continue;
+    const block = await publicClient.getBlock({ blockNumber: log.blockNumber });
+    const grantedAt = Number(block.timestamp);
+    out.push({
+      txHash: log.transactionHash,
+      planId: plan.id,
+      tier: plan.tier,
+      pricePaid: formatUnits(value, PENGU.decimals),
+      grantedAt,
+      expiresAt: grantedAt + plan.hours * 3600,
+      verifiedAt: Date.now(),
+      subscription: !!plan.subscription,
+    });
+  }
+  return out;
+}
+
+export async function discoverOnChainAccess(user: Address, onState?: (s: ScanState) => void): Promise<AccessGrant[]> {
+  onState?.("scanning");
+  try {
+    const head = await publicClient.getBlockNumber();
+    const full = head > BigInt(AUTO_SCAN.blocks) ? head - BigInt(AUTO_SCAN.blocks) : 0n;
+    try {
+      const grants = await scanRange(user, full);
+      onState?.("done");
+      return grants;
+    } catch {
+      // RPC محدودهٔ بزرگ را نپذیرفت — بازهٔ کوچک‌تر
+      const small = head > BigInt(Math.floor(AUTO_SCAN.blocks / AUTO_SCAN.fallbackFactor))
+        ? head - BigInt(Math.floor(AUTO_SCAN.blocks / AUTO_SCAN.fallbackFactor))
+        : 0n;
+      const grants = await scanRange(user, small);
+      onState?.("done");
+      return grants;
+    }
+  } catch {
+    onState?.("error");
+    return [];
+  }
+}
+
+/* --------------------------- پروفایل Portal ----------------------------
+ * خواندن پروفایل عمومی کاربر از API رسمی Abstract Portal (اختیاری؛
+ * اگر API در دسترس نبود، بدون خطا نادیده گرفته می‌شود).
+ */
+export interface PortalProfile {
+  username?: string;
+  image?: string;
+  bio?: string;
+}
+
+const PROFILE_CACHE = "pp:portalProfile:v1";
+
+export async function fetchPortalProfile(user: Address): Promise<PortalProfile | null> {
+  const key = user.toLowerCase();
+  try {
+    const raw = localStorage.getItem(PROFILE_CACHE);
+    if (raw) {
+      const c = JSON.parse(raw) as { at: number; addr: string; p: PortalProfile };
+      if (c.addr === key && Date.now() - c.at < 10 * 60_000) return c.p;
+    }
+  } catch {
+    /* cache miss */
+  }
+  for (const buildUrl of ECOSYSTEM.profileApis) {
+    try {
+      const res = await fetch(buildUrl(user), { headers: { accept: "application/json" } });
+      if (!res.ok) continue;
+      const j = (await res.json()) as Record<string, unknown>;
+      const data = (j.data ?? j.profile ?? j) as Record<string, unknown>;
+      const p: PortalProfile = {
+        username: (data.username ?? data.name ?? data.handle) as string | undefined,
+        image: (data.image ?? data.avatar ?? data.pfp ?? data.profileImage) as string | undefined,
+        bio: (data.bio ?? data.description) as string | undefined,
+      };
+      if (p.username || p.image) {
+        try {
+          localStorage.setItem(PROFILE_CACHE, JSON.stringify({ at: Date.now(), addr: key, p }));
+        } catch {
+          /* ignore */
+        }
+        return p;
+      }
+    } catch {
+      /* endpoint بعدی */
+    }
+  }
+  return null;
 }
 
 /* ----------------------------- ذخیرهٔ دسترسی -------------------------- */

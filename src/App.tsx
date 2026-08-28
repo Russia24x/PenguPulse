@@ -7,7 +7,7 @@ import { ABSTRACT, APP, PENGU, fmt, planById, type Plan } from "./config";
 import { I18nProvider, useI18n } from "./i18n";
 import { analyze } from "./lib/ta";
 import { fetchMarket, type MarketBundle } from "./lib/market";
-import { bestAccess, fetchBlockNumber, readAutoRenew, type AccessGrant } from "./lib/chain";
+import { bestAccess, discoverOnChainAccess, fetchBlockNumber, readAutoRenew, saveGrantFor, type AccessGrant, type ScanState } from "./lib/chain";
 import { PenguLogo, IcBolt, IcCandles, IcCompass, IcGlobe, IcPulse, IcRefresh, IcSnow } from "./components/icons";
 import { PriceChart, Reveal, SignalGauge, TickerTape, type TickerItem } from "./components/display";
 import { Footer, IndicatorPanel, MethodPanel, RiskPanel, SecurityPanel } from "./components/panels";

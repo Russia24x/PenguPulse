@@ -75,6 +75,38 @@ export const planById = (id: PlanId): Plan => PLANS.find((p) => p.id === id)!;
 export const MIN_PAYMENT = "1";
 
 /* ------------------------------------------------------------------ */
+/* کشف خودکار دسترسی از زنجیره (بدون نیاز به هش یا ذخیرهٔ محلی)          */
+/* ------------------------------------------------------------------ */
+export const AUTO_SCAN = {
+  /** بازهٔ اسکن به تعداد بلوک (Abstract ≈ 1s/block → ~3 روز) */
+  blocks: 259_200,
+  /** در صورت خطای محدودهٔ RPC، یک‌بار با این ضریب کوچک‌تر تکرار می‌شود */
+  fallbackFactor: 6,
+  /** فاصلهٔ اسکن دوره‌ای پس از اتصال (میلی‌ثانیه) */
+  intervalMs: 60_000,
+} as const;
+
+/* ------------------------------------------------------------------ */
+/* اکوسیستم Abstract — همهٔ لینک‌ها و APIهای برون‌سازمانی یکجا            */
+/* ------------------------------------------------------------------ */
+export const ECOSYSTEM = {
+  portal: "https://portal.abs.xyz",
+  wallet: "https://abs.xyz/wallet",
+  build: "https://build.abs.xyz",
+  docs: "https://docs.abs.xyz",
+  portalDocs: "https://docs.abs.xyz/portal/overview",
+  jsonRpc: "https://docs.abs.xyz/api-reference/overview/abstract-json-rpc-api",
+  aiAgents: "https://docs.abs.xyz/ai-agents/resources/overview",
+  agw: "https://docs.abs.xyz/abstract-global-wallet/overview",
+  llmsTxt: "https://docs.abs.xyz/llms.txt",
+  /** API پروفایل Portal — چند مسیر محتمل؛ اولین پاسخ معتبر استفاده می‌شود */
+  profileApis: [
+    (a: string) => `https://portal.abs.xyz/api/profile/${a}`,
+    (a: string) => `https://api.portal.abs.xyz/api/profile/${a}`,
+  ],
+} as const;
+
+/* ------------------------------------------------------------------ */
 /* موتور تحلیل — وزن اندیکاتورها (مجموع = 100)                          */
 /* ------------------------------------------------------------------ */
 export const ENGINE = {
