@@ -101,21 +101,25 @@ export interface Dict {
   plans: {
     title: string;
     body: string;
+    signup: string;
+    signupDesc: string;
     signal: string;
     signalDesc: string;
-    full: string;
-    fullDesc: string;
     week: string;
     weekDesc: string;
     month: string;
     monthDesc: string;
+    year: string;
+    yearDesc: string;
     pay: string;
     popular: string;
     subscription: string;
+    permanent: string;
     treasury: string;
     networkFee: string;
     duration: string;
     hours: (h: number) => string;
+    featureSignup: string[];
     featureSignal: string[];
     featureFull: string[];
     autoRenew: string;
@@ -252,8 +256,8 @@ const fa: Dict = {
     title1: "ترمینال سیگنال",
     title2: "پنگو",
     lead: "هشت اندیکاتور کلاسیک، دو تایم‌فریم، یک امتیاز ریاضی شفاف — سیگنال خرید/فروش $PENGU از دل دادهٔ واقعی بازار؛ دسترسی با پرداخت PENGU و تأیید مستقیم روی زنجیره.",
-    ctaSignal: "سیگنال امروز — ۱ PENGU",
-    ctaFull: "دسترسی کامل — ۵ PENGU",
+    ctaSignal: "سیگنال امروز — ۵ PENGU",
+    ctaFull: "ثبت‌نام — ۱۰ PENGU",
     scroll: "ورود به ترمینال",
   },
   gauge: {
@@ -319,23 +323,27 @@ const fa: Dict = {
   },
   plans: {
     title: "تعرفه‌ها — پرداخت مستقیم با PENGU",
-    body: "هر پرداخت یک انتقال ERC-20 روی Abstract به خزانهٔ عمومی پروژه است؛ رسید تراکنش همان لحظه روی زنجیره راستی‌آزمایی می‌شود و تا پایان مهلت، دسترسی را باز می‌کند.",
+    body: "هر پرداخت یک انتقال مستقیم ERC-20 روی Abstract به خزانهٔ عمومی پروژه است؛ رسید تراکنش همان لحظه روی زنجیره راستی‌آزمایی می‌شود و دسترسی را باز می‌کند. بدون Session Key و بدون هیچ اجازهٔ برداشت خودکار.",
+    signup: "ثبت‌نام و ورود",
+    signupDesc: "یک‌بار پرداخت، برای همیشه — ترمینال بازار بدون سیگنال",
     signal: "سیگنال امروز",
-    signalDesc: "دسترسی ۲۴ ساعته به سیگنال روزانه",
-    full: "دسترسی کامل",
-    fullDesc: "کل ترمینال برای ۳۰ روز",
-    week: "اشتراک هفتگی",
-    weekDesc: "دسترسی کامل ۷ روزه + یادآوری تمدید",
-    month: "اشتراک ماهانه",
-    monthDesc: "دسترسی کامل ۳۰ روزه + یادآوری تمدید",
+    signalDesc: "دسترسی ۲۴ ساعته به سیگنال کامل روزانه",
+    week: "دسترسی ۷ روزه",
+    weekDesc: "سیگنال کامل برای ۷ روز + یادآوری تمدید",
+    month: "دسترسی ۳۰ روزه",
+    monthDesc: "سیگنال کامل برای ۳۰ روز + یادآوری تمدید",
+    year: "دسترسی سالانه",
+    yearDesc: "سیگنال کامل برای ۳۶۵ روز + یادآوری تمدید",
     pay: "پرداخت {n} PENGU",
     popular: "پیشنهادی",
     subscription: "اشتراک",
+    permanent: "دائمی",
     treasury: "خزانهٔ پروژه",
     networkFee: "کارمزد شبکه (ETH) جدا از مبلغ تعرفه است.",
     duration: "مدت اعتبار",
-    hours: (h: number) => (h < 48 ? `${h} ساعت` : `${Math.round(h / 24)} روز`),
-    featureSignal: ["امتیاز و حکم موتور", "نمودار قیمت + باندها", "۵ اندیکاتور اصلی", "پیوت‌های روزانه"],
+    hours: (h: number) => (h === 0 ? "دائمی" : h < 48 ? `${h} ساعت` : h < 24 * 60 ? `${Math.round(h / 24)} روز` : `${Math.round(h / (24 * 365))} سال`),
+    featureSignup: ["ترمینال بازار و نمودارها", "جدول اندیکاتورها", "بدون سیگنال ترکیبی", "اعتبار دائمی"],
+    featureSignal: ["امتیاز و حکم موتور", "۵ اندیکاتور اصلی", "پیوت‌های روزانه", "۲۴ ساعت اعتبار"],
     featureFull: ["همهٔ ۸ اندیکاتور در ۲ تایم‌فریم", "سطوح حمایت/مقاومت و ATR", "حد ضررهای پیشنهادی", "هش داده و نسخهٔ موتور", "تمدید یک‌کلیکی"],
     autoRenew: "تمدید خودکار",
     autoRenewHint: "با فعال‌کردن، هنگام انقضای دسترسی پرداخت با یک کلیک از همین‌جا آغاز می‌شود (بدون هیچ برداشت خودکار از کیف پول).",
@@ -385,9 +393,9 @@ const fa: Dict = {
   access: {
     title: "وضعیت دسترسی",
     none: "بدون دسترسی فعال",
-    noneBody: "برای باز شدن سیگنال، یکی از تعرفه‌ها را با کیف پول متصل بپردازید یا هش پرداخت قبلی را راستی‌آزمایی کنید.",
-    tier1: "سیگنال روزانه",
-    tier2: "دسترسی کامل",
+    noneBody: "برای ورود به ترمینال، ثبت‌نام (۱۰ PENGU، دائمی) را بپردازید؛ برای سیگنال کامل، یکی از تعرفه‌های سیگنال را انتخاب کنید. دسترسی‌ها مستقیم روی زنجیره کشف و راستی‌آزمایی می‌شوند.",
+    tier1: "ترمینال بازار",
+    tier2: "سیگنال کامل",
     activeUntil: "فعال تا",
     plan: "تعرفه",
     tx: "تراکنش",
@@ -452,7 +460,7 @@ const fa: Dict = {
     smartWallet: "کیف پول هوشمند AGW",
     foundation: "لایهٔ بنیادین امنیت",
     dailySignal: "سیگنال امروز",
-    dailyBody: "یک PENGU برای ۲۴ ساعت دسترسی به سیگنال روزانه — سبک‌ترین راه آزمودن موتور تحلیل.",
+    dailyBody: "۵ PENGU برای ۲۴ ساعت دسترسی به سیگنال کامل روزانه — سبک‌ترین راه آزمودن موتور تحلیل.",
     dailyReset: "بازنشانی روزانه (UTC)",
     unlock: "بازکردن با {n} PENGU",
     otherPlans: "سایر تعرفه‌ها و اشتراک‌ها",
@@ -462,6 +470,7 @@ const fa: Dict = {
 
 const en: Dict = {
   meta: {
+    appName: "Pengu Pulse",
     title: "Pengu Pulse | PENGU Signal Terminal on Abstract",
     tagline: "Hybrid technical-analysis engine for $PENGU — live data, on-chain verification, running on Abstract",
   },
@@ -491,8 +500,8 @@ const en: Dict = {
     title1: "The Pengu",
     title2: "Signal Terminal",
     lead: "Eight classic indicators, two timeframes, one transparent math score — a buy/sell signal for $PENGU straight from real market data; unlocked with PENGU payments verified directly on-chain.",
-    ctaSignal: "Today's signal — 1 PENGU",
-    ctaFull: "Full access — 5 PENGU",
+    ctaSignal: "Today's signal — 5 PENGU",
+    ctaFull: "Sign-up — 10 PENGU",
     scroll: "Enter the terminal",
   },
   gauge: {
@@ -558,23 +567,27 @@ const en: Dict = {
   },
   plans: {
     title: "Pricing — pay in PENGU, on Abstract",
-    body: "Every payment is an ERC-20 transfer on Abstract to the project's public treasury; the receipt is verified on-chain the moment it lands and unlocks access until it expires.",
+    body: "Every payment is a direct ERC-20 transfer on Abstract to the project's public treasury; the receipt is verified on-chain the moment it lands and unlocks access. No session keys, no automatic withdrawal allowance.",
+    signup: "Sign-up & entry",
+    signupDesc: "Pay once, forever — market terminal without signals",
     signal: "Today's signal",
-    signalDesc: "24-hour access to the daily signal",
-    full: "Full access",
-    fullDesc: "The whole terminal for 30 days",
-    week: "Weekly plan",
-    weekDesc: "7-day full access + renewal reminder",
-    month: "Monthly plan",
-    monthDesc: "30-day full access + renewal reminder",
+    signalDesc: "24-hour access to the full daily signal",
+    week: "7-day access",
+    weekDesc: "Full signal for 7 days + renewal reminder",
+    month: "30-day access",
+    monthDesc: "Full signal for 30 days + renewal reminder",
+    year: "Yearly access",
+    yearDesc: "Full signal for 365 days + renewal reminder",
     pay: "Pay {n} PENGU",
     popular: "Best value",
     subscription: "Subscription",
+    permanent: "Lifetime",
     treasury: "Project treasury",
     networkFee: "Network fee (ETH) is separate from the tariff.",
     duration: "Validity",
-    hours: (h: number) => (h < 48 ? `${h} hours` : `${Math.round(h / 24)} days`),
-    featureSignal: ["Engine score & verdict", "Price chart + bands", "Top 5 indicators", "Daily pivots"],
+    hours: (h: number) => (h === 0 ? "Lifetime" : h < 48 ? `${h} hours` : h < 24 * 60 ? `${Math.round(h / 24)} days` : `${Math.round(h / (24 * 365))} year`),
+    featureSignup: ["Market terminal & charts", "Indicator board", "No composite signal", "Lifetime validity"],
+    featureSignal: ["Engine score & verdict", "Top 5 indicators", "Daily pivots", "24-hour validity"],
     featureFull: ["All 8 indicators on 2 timeframes", "Support/resistance + ATR", "Suggested stops", "Data hash & engine version", "One-click renewal"],
     autoRenew: "Auto-renew",
     autoRenewHint: "When enabled, renewal starts from here with one click as access expires (never an automatic withdrawal).",
