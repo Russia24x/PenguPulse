@@ -365,19 +365,6 @@ export function PayModal({
 }
 
 /* ------------------------------- PlansPanel ----------------------------- */
-function useUtcCountdown(): string {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const iv = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(iv);
-  }, []);
-  const next = Date.UTC(new Date(now).getUTCFullYear(), new Date(now).getUTCMonth(), new Date(now).getUTCDate() + 1);
-  const ms = Math.max(0, next - now);
-  const h = Math.floor(ms / 3_600_000);
-  const m = Math.floor((ms % 3_600_000) / 60_000);
-  const s = Math.floor((ms % 60_000) / 1000);
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
 
 export function PlansPanel({
   wallet,
@@ -393,7 +380,6 @@ export function PlansPanel({
   const { t } = useI18n();
   const [autoRenew, setAutoRenew] = useState(() => readAutoRenew()?.enabled ?? false);
   const [renewPlan, setRenewPlan] = useState<PlanId>(() => readAutoRenew()?.planId ?? "week");
-  const countdown = useUtcCountdown();
   void notify;
 
   const featured = PLANS.find((p) => p.id === "signal")!;
@@ -418,15 +404,15 @@ export function PlansPanel({
             <p className="mt-5 font-mono text-[56px] font-bold leading-none text-beak tabular">
               1<span className="ms-2 text-[18px] font-semibold text-snow/80">{PENGU.symbol}</span>
             </p>
-            <div className="mt-4 flex items-center gap-3 rounded-xl border border-line bg-abyss/60 px-4 py-3">
-              <span className="relative flex h-2 w-2 shrink-0">
-                <span className="pp-ping absolute h-full w-full rounded-full bg-beak" />
-                <span className="relative h-2 w-2 rounded-full bg-beak" />
-              </span>
-              <div>
-                <p className="text-[11px] text-faint">{t.terminal.dailyReset}</p>
-                <p className="font-mono text-[17px] font-bold text-snow tabular" dir="ltr">{countdown}</p>
-              </div>
+            <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-line bg-abyss/60 px-4 py-3">
+              <p className="flex items-center gap-2 text-[12.5px] text-fog">
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="pp-ping absolute h-full w-full rounded-full bg-beak" />
+                  <span className="relative h-2 w-2 rounded-full bg-beak" />
+                </span>
+                {t.plans.duration}
+              </p>
+              <p className="font-mono text-[16px] font-bold text-snow tabular">{t.plans.hours(featured.hours)}</p>
             </div>
             <ul className="mt-4 flex-1 space-y-2">
               {t.plans.featureSignal.map((f, i) => (
