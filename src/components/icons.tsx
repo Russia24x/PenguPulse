@@ -147,41 +147,4 @@ export const PenguLogo = ({ size = 34 }: { size?: number }) => (
   </svg>
 );
 
-/** ماسکوت پنگو با حالت‌های چهره بر اساس سیگنال */
-export function Mascot({ mood, size = 120 }: { mood: "happy" | "sad" | "cool" | "wait"; size?: number }) {
-  const mouth =
-    mood === "happy" ? (
-      <path d="M26 40 Q32 46 38 40" stroke="#10161D" strokeWidth="2.4" strokeLinecap="round" fill="none" />
-    ) : mood === "sad" ? (
-      <path d="M26 44 Q32 38.5 38 44" stroke="#10161D" strokeWidth="2.4" strokeLinecap="round" fill="none" />
-    ) : mood === "cool" ? (
-      <>
-        <rect x="18" y="24" width="28" height="7.5" rx="3.5" fill="#10161D" />
-        <path d="M46 27.5h5" stroke="#10161D" strokeWidth="2.4" strokeLinecap="round" />
-      </>
-    ) : (
-      <circle cx="32" cy="42.5" r="2.1" fill="#10161D" />
-    );
-  return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className="pp-bob" aria-hidden>
-      <ellipse cx="32" cy="59" rx="15" ry="3.4" fill="#06101A" opacity="0.7" />
-      <ellipse cx="32" cy="36" rx="19" ry="23" fill="#141B23" />
-      <ellipse cx="32" cy="42.5" rx="12" ry="14.5" fill="#EAF4F9" />
-      <ellipse cx="12.5" cy="37" rx="5" ry="11" fill="#141B23" transform="rotate(16 12.5 37)" />
-      <ellipse cx="51.5" cy="37" rx="5" ry="11" fill="#141B23" transform="rotate(-16 51.5 37)" />
-      <path d="M24 55l-2.5 5h6L26 55M40 55l-2.5 5h6L42 55" fill="#FF9E2C" />
-      {mood !== "cool" && (
-        <>
-          <circle cx="25" cy="26.5" r="3.4" fill="#EAF4F9" className="pp-eye" />
-          <circle cx="39" cy="26.5" r="3.4" fill="#EAF4F9" className="pp-eye" />
-          <circle cx="25.9" cy="26.5" r="1.5" fill="#10161D" />
-          <circle cx="38.1" cy="26.5" r="1.5" fill="#10161D" />
-        </>
-      )}
-      <path d="M32 30l6.5 4.5L32 39l-6.5-4.5L32 30Z" fill="#FF9E2C" />
-      {mouth}
-      <circle cx="18" cy="31" r="2.6" fill="#4CC9E8" opacity="0.5" />
-      <circle cx="46" cy="31" r="2.6" fill="#4CC9E8" opacity="0.5" />
-    </svg>
-  );
-}
+

@@ -1,6 +1,6 @@
 /**
  * لایهٔ نمایش — عناصر زندهٔ بصری
- * Reveal • SnowCanvas • TickerTape • SignalGauge • PriceChart
+ * Reveal • TickerTape • SignalGauge • PriceChart
  */
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { bollinger, ema, type Candle } from "../lib/ta";
@@ -42,60 +42,7 @@ export function Reveal({
   );
 }
 
-/* ---------------------------- SnowCanvas ----------------------------- */
-export function SnowCanvas() {
-  const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const canvas = ref.current!;
-    const ctx = canvas.getContext("2d")!;
-    let raf = 0;
-    let flakes: { x: number; y: number; r: number; s: number; w: number }[] = [];
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const n = Math.round(window.innerWidth / 22);
-      flakes = Array.from({ length: n }, () => ({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        r: 0.7 + Math.random() * 1.9,
-        s: 0.25 + Math.random() * 0.75,
-        w: Math.random() * Math.PI * 2,
-      }));
-    };
-    const tick = () => {
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-      ctx.fillStyle = "rgba(214,238,248,0.5)";
-      for (const f of flakes) {
-        f.y += f.s;
-        f.w += 0.008;
-        f.x += Math.sin(f.w) * 0.3;
-        if (f.y > window.innerHeight + 4) {
-          f.y = -4;
-          f.x = Math.random() * window.innerWidth;
-        }
-        ctx.globalAlpha = 0.18 + f.r * 0.14;
-        ctx.beginPath();
-        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-      raf = requestAnimationFrame(tick);
-    };
-    resize();
-    tick();
-    window.addEventListener("resize", resize);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
-    };
-  }, []);
-  return <canvas ref={ref} className="pointer-events-none fixed inset-0 z-0" aria-hidden />;
-}
+
 
 /* ----------------------------- TickerTape ---------------------------- */
 export interface TickerItem {
