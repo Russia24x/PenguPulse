@@ -116,6 +116,12 @@ export class ChainError extends Error {
 
 const MIN_WEI = parseUnits(MIN_PAYMENT, PENGU.decimals);
 
+/** انقضا: برای تعرفه‌های دائمی (ثبت‌نام) عملاً بی‌پایان است */
+function expiresFor(plan: Plan, grantedAtSec: number): number {
+  if (plan.permanent) return grantedAtSec + 365 * 24 * 3600 * 100; // ~100 سال
+  return grantedAtSec + plan.hours * 3600;
+}
+
 function inferPlan(amountWei: bigint): Plan | null {
   const sorted = [...PLANS].sort((a, b) => Number(parseUnits(b.price, PENGU.decimals) - parseUnits(a.price, PENGU.decimals)));
   for (const p of sorted) {

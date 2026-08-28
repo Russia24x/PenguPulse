@@ -45,34 +45,37 @@ export const PENGU = {
 export const TREASURY = "0x60Df4E186364c3a49A550Aee29Da1d5fe3658818";
 
 /* ------------------------------------------------------------------ */
-/* تعرفه‌ها — قیمت‌ها به واحد PENGU و مدت به ساعت                       */
+/* تعرفه‌ها — قیمت‌ها به واحد PENGU؛ همهٔ پرداخت‌ها انتقال مستقیم ERC-20   */
 /* ------------------------------------------------------------------ */
-export type PlanId = "signal" | "full" | "week" | "month";
+export type PlanId = "signup" | "signal" | "week" | "month" | "year";
 
 export interface Plan {
   id: PlanId;
   /** قیمت به واحد PENGU */
   price: string;
-  /** مدت اعتبار (ساعت) */
+  /** مدت اعتبار (ساعت)؛ 0 = دائمی */
   hours: number;
-  /** سطح دسترسی: 1 = سیگنال روزانه، 2 = کامل */
+  /** سطح دسترسی: 1 = ترمینال بازار (بدون سیگنال)، 2 = کامل با سیگنال */
   tier: 1 | 2;
+  /** دائمی (یک‌بار پرداخت، برای همیشه) */
+  permanent?: boolean;
   /** اشتراک (با یادآوری تمدید خودکار) */
   subscription?: boolean;
   popular?: boolean;
 }
 
 export const PLANS: Plan[] = [
-  { id: "signal", price: "1", hours: 24, tier: 1 },
-  { id: "full", price: "5", hours: 24 * 30, tier: 2, popular: true },
-  { id: "week", price: "7", hours: 24 * 7, tier: 2, subscription: true },
-  { id: "month", price: "30", hours: 24 * 30, tier: 2, subscription: true },
+  { id: "signup", price: "10", hours: 0, tier: 1, permanent: true },
+  { id: "signal", price: "5", hours: 24, tier: 2 },
+  { id: "week", price: "30", hours: 24 * 7, tier: 2, subscription: true, popular: true },
+  { id: "month", price: "100", hours: 24 * 30, tier: 2, subscription: true },
+  { id: "year", price: "1500", hours: 24 * 365, tier: 2, subscription: true },
 ];
 
 export const planById = (id: PlanId): Plan => PLANS.find((p) => p.id === id)!;
 
 /** حداقل مبلغ برای به‌رسمیت‌شناختن یک تراکنش به‌عنوان پرداخت (جلوگیری از اسپم) */
-export const MIN_PAYMENT = "1";
+export const MIN_PAYMENT = "5";
 
 /* ------------------------------------------------------------------ */
 /* کشف خودکار دسترسی از زنجیره (بدون نیاز به هش یا ذخیرهٔ محلی)          */
