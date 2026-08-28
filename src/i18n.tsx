@@ -6,7 +6,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { DEFAULT_LANG, type Lang } from "./config";
 
 export interface Dict {
-  meta: { title: string; tagline: string };
+  meta: { appName: string; title: string; tagline: string };
   nav: { signal: string; indicators: string; plans: string; security: string; method: string; verify: string };
   status: {
     live: string;
@@ -222,6 +222,7 @@ export interface Dict {
 
 const fa: Dict = {
   meta: {
+    appName: "پنگو پالس",
     title: "پنگو پالس | ترمینال سیگنال PENGU روی Abstract",
     tagline: "موتور تحلیل تکنیکال ترکیبی $PENGU — دادهٔ زنده، راستی‌آزمایی روی‌زنجیره‌ای، اجرا روی Abstract",
   },

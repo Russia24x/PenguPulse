@@ -159,5 +159,8 @@ export const fmt = {
   },
 };
 
-export type Lang = "fa" | "en";
+export type Lang = "fa" | "en" | "es" | "pt" | "tr" | "zh" | "ar" | "ko";
 export const DEFAULT_LANG: Lang = "fa";
+
+/** زبان‌های راست‌به‌چپ */
+export const RTL_LANGS: Lang[] = ["fa", "ar"];
