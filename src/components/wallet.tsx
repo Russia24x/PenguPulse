@@ -1,51 +1,56 @@
 /**
  * کیف پول، پرداخت، تعرفه‌ها، راستی‌آزمایی و وضعیت دسترسی
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ABSTRACT, PENGU, PLANS, TREASURY, fmt, planById, type Plan, type PlanId } from "../config";
 import { useI18n } from "../i18n";
 import {
   ChainError,
   bestAccess,
   confirmAndGrant,
-  connectWallet,
-  ensureAbstractNetwork,
   explorerAddr,
   explorerTx,
   fetchPenguBalance,
-  pickProvider,
   readAutoRenew,
   saveGrantFor,
-  sendPayment,
+  sendPaymentViaAgw,
   treasuryAddress,
   verifyTxHash,
   writeAutoRenew,
   type AccessGrant,
-  type Eip1193Provider,
 } from "../lib/chain";
-import { IcChain, IcCheck, IcCopy, IcExternal, IcLock, IcRefresh, IcSearch, IcShield, IcWallet, IcX } from "./icons";
+import { IcCheck, IcCopy, IcExternal, IcLock, IcRefresh, IcSearch, IcShield, IcWallet, IcX } from "./icons";
 import { Section, planName } from "./panels";
 import type { Address } from "viem";
 import { parseUnits } from "viem";
+import { useLoginWithAbstract, useAbstractClient } from "@abstract-foundation/agw-react";
+import { useAccount } from "wagmi";
+import type { AbstractClient } from "@abstract-foundation/agw-client";
 
-/* ------------------------------- useWallet ------------------------------ */
+/* ------------------------------- useWallet ------------------------------
+ * ورود و امضا تماماً توسط Abstract Global Wallet (AGW) انجام می‌شود.
+ * AGW یک کیف پول هوشمند درون‌مرورگری است؛ کاربر با ایمیل/QR/اکانت اجتماعی
+ * وارد می‌شود و نیازی به نصب هیچ افزونه‌ای ندارد. وضعیت اتصال از wagmi
+ * (useAccount) و کلاینت پرداخت از useAbstractClient می‌آید.
+ */
 export interface WalletApi {
-  status: "idle" | "connecting" | "connected" | "wrong-network";
+  status: "idle" | "connecting" | "connected";
   address: Address | null;
   balance: bigint | null;
-  noWallet: boolean;
-  connect: () => Promise<void>;
+  connect: () => void;
   disconnect: () => void;
-  switchToAbstract: () => Promise<void>;
   refreshBalance: () => Promise<void>;
+  abstractClient: AbstractClient | null;
 }
 
 export function useWallet(): WalletApi {
-  const [status, setStatus] = useState<WalletApi["status"]>("idle");
-  const [address, setAddress] = useState<Address | null>(null);
+  const { address: rawAddress, isConnected, isConnecting } = useAccount();
+  const { login, logout } = useLoginWithAbstract();
+  const { data: abstractClient } = useAbstractClient();
   const [balance, setBalance] = useState<bigint | null>(null);
-  const [noWallet, setNoWallet] = useState(false);
-  const providerRef = useRef<Eip1193Provider | null>(null);
+
+  const address = (rawAddress as Address | undefined) ?? null;
+  const status: WalletApi["status"] = isConnecting ? "connecting" : isConnected ? "connected" : "idle";
 
   const refreshBalance = useCallback(async () => {
     if (!address) return;
@@ -56,65 +61,20 @@ export function useWallet(): WalletApi {
     }
   }, [address]);
 
-  const connect = useCallback(async () => {
-    setStatus("connecting");
-    setNoWallet(false);
-    try {
-      const provider = await pickProvider();
-      if (!provider) {
-        setNoWallet(true);
-        setStatus("idle");
-        return;
-      }
-      providerRef.current = provider;
-      const { address: addr, chainId } = await connectWallet(provider);
-      setAddress(addr);
-      if (chainId !== ABSTRACT.id) {
-        try {
-          await ensureAbstractNetwork(provider);
-          setStatus("connected");
-        } catch {
-          setStatus("wrong-network");
-        }
-      } else setStatus("connected");
-
-      provider.on?.("accountsChanged", (...args: unknown[]) => {
-        const accs = args[0] as string[];
-        if (!accs?.length) {
-          setAddress(null);
-          setStatus("idle");
-        } else setAddress(accs[0] as Address);
-      });
-      provider.on?.("chainChanged", (...args: unknown[]) => {
-        const cid = parseInt(args[0] as string, 16);
-        setStatus(cid === ABSTRACT.id ? "connected" : "wrong-network");
-      });
-    } catch {
-      setStatus("idle");
-    }
-  }, []);
-
-  const switchToAbstract = useCallback(async () => {
-    if (!providerRef.current) return;
-    try {
-      await ensureAbstractNetwork(providerRef.current);
-      setStatus("connected");
-    } catch {
-      setStatus("wrong-network");
-    }
-  }, []);
-
-  const disconnect = useCallback(() => {
-    setAddress(null);
-    setBalance(null);
-    setStatus("idle");
-  }, []);
-
   useEffect(() => {
     if (status === "connected") void refreshBalance();
+    else setBalance(null);
   }, [status, refreshBalance]);
 
-  return { status, address, balance, noWallet, connect, disconnect, switchToAbstract, refreshBalance };
+  return {
+    status,
+    address,
+    balance,
+    connect: login,
+    disconnect: logout,
+    refreshBalance,
+    abstractClient: abstractClient ?? null,
+  };
 }
 
 /* ------------------------------ WalletButton ---------------------------- */
@@ -129,14 +89,6 @@ export function WalletButton({ wallet, notify }: { wallet: WalletApi; notify: (m
       /* clipboard blocked */
     }
   };
-
-  if (wallet.status === "wrong-network") {
-    return (
-      <button onClick={() => void wallet.switchToAbstract()} className="btn-press flex items-center gap-2 rounded-lg border border-loss/50 bg-loss/12 px-4 py-2.5 text-sm font-bold text-loss">
-        <IcChain size={17} /> {t.status.switchHint}
-      </button>
-    );
-  }
 
   if (wallet.status === "connected" && wallet.address) {
     return (
@@ -180,16 +132,22 @@ export function WalletButton({ wallet, notify }: { wallet: WalletApi; notify: (m
   }
 
   return (
-    <div>
+    <div className="group relative">
       <button
-        onClick={() => void wallet.connect()}
+        onClick={() => wallet.connect()}
         disabled={wallet.status === "connecting"}
         className="btn-press flex items-center gap-2 rounded-lg bg-beak px-4 py-2.5 text-sm font-black text-ink shadow-[0_8px_24px_-10px_rgba(255,158,44,0.7)] hover:bg-frost disabled:opacity-60"
       >
-        <IcWallet size={17} />
+        {wallet.status === "connecting" ? (
+          <span className="pp-spin inline-block h-4 w-4 rounded-full border-2 border-ink/30 border-t-ink" />
+        ) : (
+          <IcWallet size={17} />
+        )}
         {wallet.status === "connecting" ? t.status.connecting : t.status.connectWallet}
       </button>
-      {wallet.noWallet && <p className="absolute end-4 mt-2 w-60 rounded-lg border border-loss/40 bg-abyss/95 p-3 text-[12px] leading-5 text-loss">{t.status.noWallet}</p>}
+      <span className="pointer-events-none absolute end-0 top-full z-50 mt-2 hidden w-56 rounded-lg border border-line bg-abyss/95 p-2.5 text-[11.5px] leading-5 text-fog group-hover:block">
+        {t.status.loginHint}
+      </span>
     </div>
   );
 }
@@ -227,13 +185,11 @@ export function PayModal({
 
   const start = async () => {
     if (!wallet.address) return;
+    if (!wallet.abstractClient) throw new ChainError("NETWORK", "AGW client not ready");
     setErrCode(null);
     setStep("signing");
     try {
-      const provider = await pickProvider();
-      if (!provider) throw new ChainError("NETWORK");
-      await ensureAbstractNetwork(provider);
-      const hash = await sendPayment(provider, wallet.address, plan);
+      const hash = await sendPaymentViaAgw(wallet.abstractClient, plan);
       setTxHash(hash);
       setStep("confirming");
       const g = await confirmAndGrant(hash);

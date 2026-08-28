@@ -69,86 +69,12 @@ export const tokenAddress = getAddress(PENGU.address);
 export const explorerTx = (hash: string) => `${ABSTRACT.explorer}/tx/${hash}`;
 export const explorerAddr = (addr: string) => `${ABSTRACT.explorer}/address/${addr}`;
 
-/* ------------------------------ کیف پول ------------------------------ */
-export interface Eip1193Provider {
-  request(args: { method: string; params?: unknown[] }): Promise<unknown>;
-  on?(event: string, listener: (...args: unknown[]) => void): void;
-  removeListener?(event: string, listener: (...args: unknown[]) => void): void;
-}
-
-interface Eip6963Info {
-  rdns: string;
-  name: string;
-  icon: string;
-}
-
-let discovered: { info: Eip6963Info; provider: Eip1193Provider }[] = [];
-
-export function discoverWallets(timeoutMs = 550): Promise<{ info: Eip6963Info; provider: Eip1193Provider }[]> {
-  return new Promise((resolve) => {
-    if (typeof window === "undefined") return resolve([]);
-    const onAnnounce = (e: Event) => {
-      const detail = (e as CustomEvent).detail as { info: Eip6963Info; provider: Eip1193Provider } | undefined;
-      if (detail?.info?.rdns && detail.provider) {
-        if (!discovered.some((d) => d.info.rdns === detail.info.rdns)) discovered.push(detail);
-      }
-    };
-    window.addEventListener("eip6963:announceProvider", onAnnounce);
-    window.dispatchEvent(new Event("eip6963:requestProvider"));
-    setTimeout(() => {
-      window.removeEventListener("eip6963:announceProvider", onAnnounce);
-      resolve(discovered);
-    }, timeoutMs);
-  });
-}
-
-function injected(): Eip1193Provider | null {
-  const w = window as unknown as { ethereum?: Eip1193Provider };
-  return w.ethereum ?? null;
-}
-
-export async function pickProvider(): Promise<Eip1193Provider | null> {
-  const list = await discoverWallets();
-  if (list.length === 1) return list[0].provider;
-  if (list.length > 1) {
-    // ترجیح با کیف پول Abstract / شناخته‌شده‌تر
-    const preferred = list.find((d) => /abstract|agw/i.test(d.info.rdns + d.info.name));
-    return (preferred ?? list[0]).provider;
-  }
-  return injected();
-}
-
-export async function connectWallet(provider: Eip1193Provider): Promise<{ address: Address; chainId: number }> {
-  const accounts = (await provider.request({ method: "eth_requestAccounts" })) as string[];
-  if (!accounts?.length) throw new Error("NO_ACCOUNT");
-  const chainHex = (await provider.request({ method: "eth_chainId" })) as string;
-  return { address: getAddress(accounts[0]), chainId: parseInt(chainHex, 16) };
-}
-
-export async function ensureAbstractNetwork(provider: Eip1193Provider): Promise<void> {
-  const chainHex = (await provider.request({ method: "eth_chainId" })) as string;
-  if (parseInt(chainHex, 16) === ABSTRACT.id) return;
-  try {
-    await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: ABSTRACT.hexId }] });
-  } catch (err) {
-    const code = (err as { code?: number }).code;
-    if (code === 4902 || code === -32603) {
-      await provider.request({
-        method: "wallet_addEthereumChain",
-        params: [
-          {
-            chainId: ABSTRACT.hexId,
-            chainName: ABSTRACT.name,
-            nativeCurrency: ABSTRACT.nativeCurrency,
-            rpcUrls: ABSTRACT.rpcUrls,
-            blockExplorerUrls: [ABSTRACT.explorer],
-          },
-        ],
-      });
-    } else throw err;
-  }
-}
-
+/* ------------------------------ کیف پول AGW ---------------------------
+ * ورود و امضا تماماً توسط Abstract Global Wallet انجام می‌شود؛ این لایه
+ * فقط خواندن‌های عمومی (موجودی، بلوک، رسید) را با viem انجام می‌دهد.
+ * هویت کاربر و کلیدهای نشست داخل خود AGW (Privy cross-app) مدیریت می‌شود
+ * و هیچ‌گاه به این اپ نمی‌رسند.
+ */
 export async function fetchPenguBalance(address: Address): Promise<bigint> {
   const bal = (await publicClient.readContract({
     address: tokenAddress,
@@ -208,24 +134,23 @@ export function buildPaymentData(amountPengu: string): `0x${string}` {
   });
 }
 
-/** ارسال تراکنش پرداخت از طریق کیف پول کاربر */
-export async function sendPayment(provider: Eip1193Provider, from: Address, plan: Plan): Promise<Hash> {
+/**
+ * ارسال تراکنش پرداخت از طریق Abstract Global Wallet.
+ * از abstractClient (ساخته‌شده با useAbstractClient) استفاده می‌شود؛
+ * امضای تراکنش داخل خود AGW انجام می‌شود و ما فقط هش را دریافت می‌کنیم.
+ */
+export async function sendPaymentViaAgw(client: AbstractClient, plan: Plan): Promise<Hash> {
   try {
-    const hash = (await provider.request({
-      method: "eth_sendTransaction",
-      params: [
-        {
-          from,
-          to: tokenAddress,
-          data: buildPaymentData(plan.price),
-        },
-      ],
-    })) as Hash;
+    const hash = await client.sendTransaction({
+      to: tokenAddress,
+      data: buildPaymentData(plan.price),
+    });
     return hash;
   } catch (err) {
-    const code = (err as { code?: number | string }).code;
-    if (code === 4001 || code === "ACTION_REJECTED") throw new ChainError("USER_REJECTED");
-    throw new ChainError("NETWORK", (err as Error).message);
+    const e = err as { code?: number | string; name?: string; message?: string };
+    if (e.code === 4001 || e.code === "ACTION_REJECTED" || /user (denied|rejected)/i.test(e.message ?? ""))
+      throw new ChainError("USER_REJECTED");
+    throw new ChainError("NETWORK", e.message);
   }
 }
 
@@ -235,8 +160,15 @@ interface TransferInfo {
   value: bigint;
 }
 
+/** رسید تراکنش — سازگار با قالب استاندارد و ZkSync (زنجیرهٔ Abstract) */
+interface AnyReceipt {
+  status: "success" | "reverted";
+  blockNumber: bigint;
+  logs: readonly { address: string; topics: readonly `0x${string}`[]; data: `0x${string}` }[];
+}
+
 /** استخراج و اعتبارسنجی لاگ Transfer PENGU به خزانه از رسید */
-function extractValidTransfer(receipt: { status: "success" | "reverted"; logs: { address: string; topics: readonly `0x${string}`[]; data: `0x${string}` }[] }): TransferInfo {
+function extractValidTransfer(receipt: AnyReceipt): TransferInfo {
   if (receipt.status !== "success") throw new ChainError("TX_FAILED");
   for (const log of receipt.logs) {
     if (getAddress(log.address) !== tokenAddress) continue;
@@ -273,7 +205,7 @@ export interface VerifyResult {
 }
 
 async function grantFromHash(hash: Hash): Promise<VerifyResult> {
-  let receipt: Awaited<ReturnType<PublicClient["getTransactionReceipt"]>>;
+  let receipt: AnyReceipt;
   try {
     receipt = await publicClient.getTransactionReceipt({ hash });
   } catch {
@@ -301,7 +233,7 @@ async function grantFromHash(hash: Hash): Promise<VerifyResult> {
 
 /** صبر برای تأیید تراکنش و تبدیل آن به دسترسی معتبر */
 export async function confirmAndGrant(hash: Hash): Promise<AccessGrant> {
-  let receipt: Awaited<ReturnType<PublicClient["waitForTransactionReceipt"]>>;
+  let receipt: AnyReceipt;
   try {
     receipt = await publicClient.waitForTransactionReceipt({ hash, confirmations: 1, timeout: 120_000, pollingInterval: 1500 });
   } catch {

@@ -5,7 +5,7 @@
 ```
 CoinGecko API ──► lib/market.ts ──► کندل‌های 4H/1D ──► lib/ta.ts (موتور) ──► Analysis
                                                                                  │
-Abstract RPC ◄── viem (lib/chain.ts) ◄── کیف پول کاربر (EIP-6963)                ▼
+Abstract RPC ◄── viem (lib/chain.ts) ◄── کیف پول هوشمند AGW (بدون افزونه)        ▼
         │                │                                               UI (App.tsx)
         └── دریافت رسید + لاگ Transfer + مهر بلوک ──► AccessGrant ──► دروازهٔ tier 0/1/2
 ```
@@ -25,7 +25,7 @@ Abstract RPC ◄── viem (lib/chain.ts) ◄── کیف پول کاربر (E
 ### جریان پرداخت (Pay Flow)
 
 1. `buildPaymentData` → کالیدیتای `transfer(treasury, amount)` روی توکن PENGU
-2. `eth_sendTransaction` از طریق کیف پول (امضای کاربر)
+2. `abstractClient.sendTransaction` از طریق AGW (امضای کاربر داخل کیف پول هوشمند)
 3. `waitForTransactionReceipt` (۱ تأیید) → بررسی `status === success`
 4. رمزگشایی لاگ `Transfer` → بررسی `token == PENGU` و `to == treasury` و `value >= حداقل`
 5. `getBlock` → مهر زمانی بلوک = شروع اعتبار؛ `expiresAt = grantedAt + hours×3600`

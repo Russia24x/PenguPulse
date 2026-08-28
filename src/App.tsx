@@ -12,6 +12,8 @@ import { Mascot, PenguLogo, IcBolt, IcCandles, IcCompass, IcGlobe, IcPulse, IcRe
 import { PriceChart, Reveal, SignalGauge, SnowCanvas, TickerTape, type TickerItem } from "./components/display";
 import { Footer, IndicatorPanel, MethodPanel, RiskPanel, SecurityPanel } from "./components/panels";
 import { AccessCard, PayModal, PlansPanel, VerifyPanel, WalletButton, useWallet } from "./components/wallet";
+import { AbstractWalletProvider } from "@abstract-foundation/agw-react";
+import { abstractChain } from "./lib/chain";
 
 interface MarketState {
   status: "loading" | "live" | "error";
@@ -101,13 +103,9 @@ function AppInner() {
   }, [access, accessTick]);
 
   const onPay = (plan: Plan) => {
-    if (wallet.status === "wrong-network") {
-      void wallet.switchToAbstract();
-      return;
-    }
     if (wallet.status !== "connected") {
       notify(t.status.connectWallet);
-      void wallet.connect();
+      wallet.connect();
       return;
     }
     setPayPlan(plan);
@@ -450,8 +448,10 @@ function AppInner() {
 
 export default function App() {
   return (
-    <I18nProvider>
-      <AppInner />
-    </I18nProvider>
+    <AbstractWalletProvider chain={abstractChain}>
+      <I18nProvider>
+        <AppInner />
+      </I18nProvider>
+    </AbstractWalletProvider>
   );
 }
