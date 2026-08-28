@@ -159,8 +159,22 @@ export const fmt = {
   },
 };
 
-export type Lang = "fa" | "en" | "es" | "pt" | "tr" | "zh" | "ar" | "ko";
+export type Lang = "fa" | "en" | "es" | "hi" | "zh" | "ja" | "ko" | "de" | "fr" | "ru";
 export const DEFAULT_LANG: Lang = "fa";
 
 /** زبان‌های راست‌به‌چپ */
-export const RTL_LANGS: Lang[] = ["fa", "ar"];
+export const RTL_LANGS: Lang[] = ["fa"];
+
+/** متادیتای نمایشی زبان‌ها برای انتخاب‌گر (نام بومی هر زبان) */
+export const LANG_META: { code: Lang; native: string; flag: string }[] = [
+  { code: "fa", native: "فارسی", flag: "🇮🇷" },
+  { code: "en", native: "English", flag: "🇬🇧" },
+  { code: "es", native: "Español", flag: "🇪🇸" },
+  { code: "hi", native: "हिन्दी", flag: "🇮🇳" },
+  { code: "zh", native: "中文", flag: "🇨🇳" },
+  { code: "ja", native: "日本語", flag: "🇯🇵" },
+  { code: "ko", native: "한국어", flag: "🇰🇷" },
+  { code: "de", native: "Deutsch", flag: "🇩🇪" },
+  { code: "fr", native: "Français", flag: "🇫🇷" },
+  { code: "ru", native: "Русский", flag: "🇷🇺" },
+];

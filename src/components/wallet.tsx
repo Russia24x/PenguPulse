@@ -390,7 +390,7 @@ export function PlansPanel({
 }) {
   const { t } = useI18n();
   const [autoRenew, setAutoRenew] = useState(() => readAutoRenew()?.enabled ?? false);
-  const [renewPlan, setRenewPlan] = useState<PlanId>(() => readAutoRenew()?.planId ?? "full");
+  const [renewPlan, setRenewPlan] = useState<PlanId>(() => readAutoRenew()?.planId ?? "week");
   const countdown = useUtcCountdown();
   void notify;
 
@@ -449,7 +449,16 @@ export function PlansPanel({
           <div className="space-y-3">
             {rows.map((p, i) => {
               const name = planName(t, p.id);
-              const desc = p.id === "full" ? t.plans.fullDesc : p.id === "week" ? t.plans.weekDesc : t.plans.monthDesc;
+              const desc =
+                p.id === "signup"
+                  ? t.plans.signupDesc
+                  : p.id === "signal"
+                    ? t.plans.signalDesc
+                    : p.id === "week"
+                      ? t.plans.weekDesc
+                      : p.id === "month"
+                        ? t.plans.monthDesc
+                        : t.plans.yearDesc;
               const active = access?.planId === p.id;
               return (
                 <div key={p.id} className="plan-row relative rounded-xl border border-line bg-panel/70 p-4 sm:p-5" style={{ transitionDelay: `${i * 30}ms` }}>
@@ -625,8 +634,8 @@ export function AccessCard({
           {renewSoon && (
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-beak/45 bg-beak/10 px-3 py-2.5">
               <p className="text-[12.5px] font-semibold text-beak">⚠ {t.access.renewSoon}</p>
-              <button onClick={() => onRenew(planById("full"))} className="btn-press rounded-lg bg-beak px-3.5 py-1.5 text-[12px] font-black text-ink hover:bg-frost">
-                {t.access.renewNow} — 5 {PENGU.symbol}
+              <button onClick={() => onRenew(planById("week"))} className="btn-press rounded-lg bg-beak px-3.5 py-1.5 text-[12px] font-black text-ink hover:bg-frost">
+                {t.access.renewNow} — 30 {PENGU.symbol}
               </button>
             </div>
           )}

@@ -363,4 +363,12 @@ export function Footer() {
 }
 
 export const planName = (t: Dict, id: string) =>
-  id === "signal" ? t.plans.signal : id === "full" ? t.plans.full : id === "week" ? t.plans.week : t.plans.month;
+  id === "signup"
+    ? t.plans.signup
+    : id === "signal"
+      ? t.plans.signal
+      : id === "week"
+        ? t.plans.week
+        : id === "month"
+          ? t.plans.month
+          : t.plans.year;
