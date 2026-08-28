@@ -61,6 +61,8 @@ export const es: Dict = {
     featureFull: ["Los 8 indicadores en 2 temporalidades", "Soporte/resistencia + ATR", "Stops sugeridos", "Hash de datos y versión del motor", "Renovación en un clic"],
     autoRenew: "Renovación automática",
     autoRenewHint: "Si está activada, la renovación comienza aquí con un clic cuando el acceso vence (nunca un cargo automático).",
+    discount: (n: number) => `${n}% dto.`,
+    baseRate: "Tarifa base: 10 PENGU/día — señal completa al doble, con descuentos de hasta 30%",
   },
   pay: {
     title: "Pagar en Abstract", amount: "Cantidad", recipient: "Destinatario (tesoro)", network: "Red", duration: "Validez", steps: "Pasos",
@@ -192,6 +194,8 @@ export const hi: Dict = {
     featureFull: ["2 टाइमफ्रेम पर सभी 8 संकेतक", "समर्थन/प्रतिरोध + ATR", "सुझाए गए स्टॉप", "डेटा हैश और इंजन संस्करण", "एक-क्लिक नवीनीकरण"],
     autoRenew: "स्वतः नवीनीकरण",
     autoRenewHint: "सक्रिय होने पर, एक्सेस समाप्त होने पर नवीनीकरण यहीं एक क्लिक से शुरू होता है (कभी स्वचालित कटौती नहीं)।",
+    discount: (n: number) => `${n}% छूट`,
+    baseRate: "आधार दर: 10 PENGU/दिन — पूर्ण सिग्नल दोगुना, 30% तक छूट",
   },
   pay: {
     title: "Abstract पर भुगतान", amount: "राशि", recipient: "प्राप्तकर्ता (खज़ाना)", network: "नेटवर्क", duration: "वैधता", steps: "चरण",
@@ -323,6 +327,8 @@ export const zh: Dict = {
     featureFull: ["两个时间周期上的全部 8 项指标", "支撑/阻力 + ATR", "建议止损", "数据哈希与引擎版本", "一键续订"],
     autoRenew: "自动续订",
     autoRenewHint: "启用后，访问到期时续订将从此处一键开始（绝不自动扣款）。",
+    discount: (n: number) => `减 ${n}%`,
+    baseRate: "基础费率：10 PENGU/天 — 完整信号为两倍，最高 30% 阶梯折扣",
   },
   pay: {
     title: "在 Abstract 上支付", amount: "金额", recipient: "收款方（金库）", network: "网络", duration: "有效期", steps: "步骤",

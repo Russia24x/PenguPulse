@@ -604,6 +604,8 @@ const en: Dict = {
     featureFull: ["All 8 indicators on 2 timeframes", "Support/resistance + ATR", "Suggested stops", "Data hash & engine version", "One-click renewal"],
     autoRenew: "Auto-renew",
     autoRenewHint: "When enabled, renewal starts from here with one click as access expires (never an automatic withdrawal).",
+    discount: (n: number) => `${n}% off`,
+    baseRate: "Base rate: 10 PENGU/day — full signal at 2x base, with step discounts up to 30%",
   },
   pay: {
     title: "Pay on Abstract",
