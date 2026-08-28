@@ -95,6 +95,11 @@ export const IcSearch = (p: P) => (
     <path d="m15.5 15.5 5 5" />
   </svg>
 );
+export const IcMenu = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M4 7h16M4 12h10M4 17h16" />
+  </svg>
+);
 export const IcGlobe = (p: P) => (
   <svg {...base(p)}>
     <circle cx="12" cy="12" r="9" />

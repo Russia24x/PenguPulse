@@ -635,7 +635,7 @@ export function AccessCard({
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-beak/45 bg-beak/10 px-3 py-2.5">
               <p className="text-[12.5px] font-semibold text-beak">⚠ {t.access.renewSoon}</p>
               <button onClick={() => onRenew(planById("week"))} className="btn-press rounded-lg bg-beak px-3.5 py-1.5 text-[12px] font-black text-ink hover:bg-frost">
-                {t.access.renewNow} — 30 {PENGU.symbol}
+                {t.access.renewNow} — {planById("week").price} {PENGU.symbol}
               </button>
             </div>
           )}

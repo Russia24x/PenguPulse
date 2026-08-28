@@ -131,6 +131,7 @@ export const es: Dict = {
     dailySignal: "Señal de hoy", dailyBody: "5 PENGU por 24 horas de señal diaria completa — la forma más ligera de probar el motor.",
     dailyReset: "Reinicio diario (UTC)", unlock: "Desbloquear por {n} PENGU", otherPlans: "Otros planes y suscripciones",
   },
+  feed: { title: "Flujo de tesorería en vivo", empty: "Sin pagos en la ventana escaneada", note: "Registros Transfer públicos hacia la tesorería — datos en cadena, cada 60 s" },
   toast: { copied: "Copiado", paid: "Pago confirmado — acceso activo", verified: "Transacción válida — acceso restaurado", payFail: "El pago falló", renewed: "Renovado con éxito" },
 };
 
@@ -261,6 +262,7 @@ export const hi: Dict = {
     dailySignal: "आज का सिग्नल", dailyBody: "दैनिक सिग्नल की 24 घंटों की एक्सेस के लिए 5 PENGU — इंजन आज़माने का सबसे हल्का तरीका।",
     dailyReset: "दैनिक रीसेट (UTC)", unlock: "{n} PENGU में अनलॉक करें", otherPlans: "अन्य योजनाएँ और सदस्यताएँ",
   },
+  feed: { title: "लाइव खज़ाना स्ट्रीम", empty: "स्कैन अवधि में कोई भुगतान नहीं", note: "खज़ाने को सार्वजनिक Transfer लॉग — ऑन-चेन डेटा, हर 60 सेकंड में ताज़ा" },
   toast: { copied: "कॉपी हुआ", paid: "भुगतान पुष्टि — एक्सेस सक्रिय", verified: "मान्य लेन-देन — एक्सेस बहाल", payFail: "भुगतान विफल", renewed: "सफलतापूर्वक नवीनीकृत" },
 };
 
@@ -391,6 +393,7 @@ export const zh: Dict = {
     dailySignal: "今日信号", dailyBody: "5 PENGU 换取 24 小时每日信号访问 — 试用引擎的最轻方式。",
     dailyReset: "每日重置（UTC）", unlock: "以 {n} PENGU 解锁", otherPlans: "其他计划与订阅",
   },
+  feed: { title: "金库实时流水", empty: "扫描区间内暂无支付", note: "指向金库的公开 Transfer 日志 — 链上数据，每 60 秒刷新" },
   toast: { copied: "已复制", paid: "支付已确认 — 访问已激活", verified: "交易有效 — 访问已恢复", payFail: "支付失败", renewed: "续订成功" },
 };
 
@@ -521,5 +524,6 @@ export const ja: Dict = {
     dailySignal: "今日のシグナル", dailyBody: "5 PENGU で毎日シグナルに 24 時間アクセス — エンジンを試す最も軽い方法。",
     dailyReset: "毎日リセット (UTC)", unlock: "{n} PENGU で解除", otherPlans: "その他のプランとサブスク",
   },
+  feed: { title: "財務ストリーム（ライブ）", empty: "スキャン範囲に支払いなし", note: "トレジャリーへの公開Transferログ — オンチェーンデータ、60秒ごとに更新" },
   toast: { copied: "コピーしました", paid: "支払い確認 — アクセス有効", verified: "有効な取引 — アクセス復元", payFail: "支払いに失敗しました", renewed: "更新が完了しました" },
 };

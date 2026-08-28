@@ -224,6 +224,7 @@ export interface Dict {
     unlock: string;
     otherPlans: string;
   };
+  feed: { title: string; empty: string; note: string };
   toast: { copied: string; paid: string; verified: string; payFail: string; renewed: string };
 }
 
@@ -468,6 +469,11 @@ const fa: Dict = {
     unlock: "بازکردن با {n} PENGU",
     otherPlans: "سایر تعرفه‌ها و اشتراک‌ها",
   },
+  feed: {
+    title: "جریان زندهٔ خزانه",
+    empty: "در بازهٔ اسکن‌شده پرداختی ثبت نشده است",
+    note: "لاگ‌های Transfer به خزانهٔ پروژه — دادهٔ عمومی زنجیره، تازه‌سازی هر ۶۰ ثانیه",
+  },
   toast: { copied: "کپی شد", paid: "پرداخت تأیید و دسترسی فعال شد", verified: "تراکنش معتبر است — دسترسی بازموند", payFail: "پرداخت ناموفق بود", renewed: "تمدید با موفقیت انجام شد" },
 };
 
@@ -711,6 +717,11 @@ const en: Dict = {
     dailyReset: "Daily reset (UTC)",
     unlock: "Unlock for {n} PENGU",
     otherPlans: "Other plans & subscriptions",
+  },
+  feed: {
+    title: "Live treasury stream",
+    empty: "No payments recorded in the scanned window",
+    note: "Public Transfer logs to the project treasury — on-chain data, refreshed every 60s",
   },
   toast: { copied: "Copied", paid: "Payment confirmed — access active", verified: "Valid transaction — access restored", payFail: "Payment failed", renewed: "Renewed successfully" },
 };

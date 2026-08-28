@@ -296,6 +296,104 @@ textarea {
   outline: none;
 }
 
+/* ---------- detail pass: grain, focus, ticks, shimmer ---------- */
+.pp-noise {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ice);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* section rule draws in when its reveal wrapper lands */
+.pp-rule {
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s;
+}
+[dir="ltr"] .pp-rule {
+  transform-origin: left center;
+}
+.is-in .pp-rule {
+  transform: scaleX(1);
+}
+
+/* ticker item feedback */
+.pp-tick {
+  transition: color 0.2s ease;
+  border-bottom: 1px solid transparent;
+}
+.pp-tick:hover {
+  color: var(--color-snow) !important;
+  border-bottom-color: var(--color-beak);
+}
+
+/* corner ticks on stat tiles */
+.stat-corner {
+  position: relative;
+}
+.stat-corner::before,
+.stat-corner::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-color: rgb(76 201 232 / 0);
+  border-style: solid;
+  transition: border-color 0.25s ease;
+}
+.stat-corner::before {
+  top: -1px;
+  inset-inline-start: -1px;
+  border-width: 1.5px 0 0 1.5px;
+}
+.stat-corner::after {
+  bottom: -1px;
+  inset-inline-end: -1px;
+  border-width: 0 1.5px 1.5px 0;
+}
+.stat-corner:hover::before,
+.stat-corner:hover::after {
+  border-color: rgb(76 201 232 / 0.9);
+}
+
+/* shimmer for pending surfaces */
+@keyframes pp-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+.pp-shimmer {
+  background: linear-gradient(100deg, #0e2133 40%, #16344f 50%, #0e2133 60%);
+  background-size: 200% 100%;
+  animation: pp-shimmer 1.6s linear infinite;
+}
+
+/* live feed row entrance */
+@keyframes pp-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.pp-row-in {
+  animation: pp-row-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
