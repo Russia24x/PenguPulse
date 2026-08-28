@@ -3,7 +3,7 @@
  * ترکیب: دادهٔ زندهٔ بازار → موتور تحلیل → دروازهٔ دسترسی روی‌زنجیره‌ای
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ABSTRACT, APP, PENGU, fmt, planById, type Plan } from "./config";
+import { ABSTRACT, APP, LANG_META, PENGU, fmt, planById, type Plan } from "./config";
 import { I18nProvider, useI18n } from "./i18n";
 import { analyze } from "./lib/ta";
 import { fetchMarket, type MarketBundle } from "./lib/market";
@@ -51,6 +51,47 @@ function BootStrip({ wallet, blockNum, dataHash, stale }: { wallet: WalletApi; b
 /* -------------------------------- Spark ---------------------------------
  * اسپارک‌لاین کوچک از آخرین بسته‌شدن‌های کندل
  */
+/* ------------------------------ LangPicker ------------------------------
+ * انتخاب‌گر ۱۰ زبانه با نام بومی هر زبان؛ جهت صفحه خودکار تغییر می‌کند.
+ */
+function LangPicker() {
+  const { lang, setLang, t } = useI18n();
+  const [open, setOpen] = useState(false);
+  const current = LANG_META.find((l) => l.code === lang) ?? LANG_META[0];
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="btn-press flex items-center gap-1.5 rounded-lg border border-line bg-panel px-3 py-2.5 text-[12.5px] font-bold text-fog hover:border-ice/50 hover:text-ice"
+        title={t.status.langToggle}
+        aria-expanded={open}
+      >
+        <IcGlobe size={15} /> {current.native}
+      </button>
+      {open && (
+        <>
+          <button className="fixed inset-0 z-40 cursor-default" onClick={() => setOpen(false)} aria-label="close" />
+          <div className="absolute end-0 z-50 mt-2 grid w-44 grid-cols-1 gap-0.5 rounded-xl border border-line bg-panel p-1.5 shadow-lift">
+            {LANG_META.map((l) => (
+              <button
+                key={l.code}
+                onClick={() => {
+                  setLang(l.code);
+                  setOpen(false);
+                }}
+                className={`flex items-center justify-between rounded-lg px-3 py-2 text-start text-[13px] transition-colors ${l.code === lang ? "bg-beak/15 font-bold text-beak" : "text-fog hover:bg-ink hover:text-snow"}`}
+              >
+                <span>{l.native}</span>
+                <span className="font-mono text-[10px] uppercase opacity-60">{l.code}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function Spark({ values, tone }: { values: number[]; tone: "gain" | "loss" | "ice" }) {
   if (values.length < 2) return null;
   const min = Math.min(...values);

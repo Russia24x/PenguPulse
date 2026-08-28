@@ -3,7 +3,10 @@
  * افزودن زبان جدید = افزودن یک شیء Dict و ثبت آن در DICTS.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { DEFAULT_LANG, type Lang } from "./config";
+import { DEFAULT_LANG, RTL_LANGS, type Lang } from "./config";
+import { es, hi, zh, ja } from "./i18n.locales1";
+import { ko, de } from "./i18n.locales2";
+import { fr, ru } from "./i18n.locales3";
 
 export interface Dict {
   meta: { appName: string; title: string; tagline: string };
@@ -712,7 +715,7 @@ const en: Dict = {
   toast: { copied: "Copied", paid: "Payment confirmed — access active", verified: "Valid transaction — access restored", payFail: "Payment failed", renewed: "Renewed successfully" },
 };
 
-const DICTS: Record<Lang, Dict> = { fa, en };
+const DICTS: Record<Lang, Dict> = { fa, en, es, hi, zh, ja, ko, de, fr, ru };
 
 interface I18nCtx {
   lang: Lang;
@@ -723,15 +726,26 @@ interface I18nCtx {
 
 const Ctx = createContext<I18nCtx>({ lang: DEFAULT_LANG, setLang: () => {}, t: DICTS[DEFAULT_LANG], dir: "rtl" });
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(() => {
-    try {
-      const saved = localStorage.getItem("pp:lang");
-      return saved === "en" || saved === "fa" ? saved : DEFAULT_LANG;
-    } catch {
-      return DEFAULT_LANG;
+const SUPPORTED = Object.keys(DICTS) as Lang[];
+
+/** تشخیص زبان مرورگر در نخستین بازدید */
+function detectLang(): Lang {
+  try {
+    const saved = localStorage.getItem("pp:lang") as Lang | null;
+    if (saved && SUPPORTED.includes(saved)) return saved;
+    const nav = (navigator.languages ?? [navigator.language]).map((l) => l.toLowerCase().slice(0, 2));
+    for (const n of nav) {
+      const hit = SUPPORTED.find((s) => s === n);
+      if (hit) return hit;
     }
-  });
+  } catch {
+    /* ignore */
+  }
+  return DEFAULT_LANG;
+}
+
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const [lang, setLangState] = useState<Lang>(detectLang);
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
@@ -742,16 +756,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const dir: "rtl" | "ltr" = RTL_LANGS.includes(lang) ? "rtl" : "ltr";
+
   useEffect(() => {
     document.documentElement.lang = lang;
-    document.documentElement.dir = lang === "fa" ? "rtl" : "ltr";
+    document.documentElement.dir = dir;
     document.title = DICTS[lang].meta.title;
-  }, [lang]);
+  }, [lang, dir]);
 
-  const value = useMemo(
-    () => ({ lang, setLang, t: DICTS[lang], dir: (lang === "fa" ? "rtl" : "ltr") as "rtl" | "ltr" }),
-    [lang, setLang],
-  );
+  const value = useMemo(() => ({ lang, setLang, t: DICTS[lang], dir }), [lang, setLang, dir]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
