@@ -18,7 +18,6 @@ import {
   formatUnits,
   getAddress,
   http,
-  isAddress,
   parseUnits,
   type Address,
   type Hash,
@@ -308,8 +307,4 @@ export function readAutoRenew(): AutoRenewPref | null {
 export function writeAutoRenew(pref: AutoRenewPref | null) {
   if (!pref) localStorage.removeItem(RENEW_KEY);
   else localStorage.setItem(RENEW_KEY, JSON.stringify(pref));
-}
-
-export function isAddressValid(a: string) {
-  return isAddress(a);
 }

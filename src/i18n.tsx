@@ -199,6 +199,24 @@ export interface Dict {
     portal: string;
     rights: string;
   };
+  terminal: {
+    agwReady: string;
+    agwOn: string;
+    gateTitle: string;
+    gateBody: string;
+    gateBtn: string;
+    why1: string;
+    why2: string;
+    why3: string;
+    gasFree: string;
+    smartWallet: string;
+    foundation: string;
+    dailySignal: string;
+    dailyBody: string;
+    dailyReset: string;
+    unlock: string;
+    otherPlans: string;
+  };
   toast: { copied: string; paid: string; verified: string; payFail: string; renewed: string };
 }
 
@@ -420,6 +438,24 @@ const fa: Dict = {
     portal: "ثبت پروژه در Abstract Portal",
     rights: "© {y} پنگو پالس — متن‌باز و قابل حسابرسی",
   },
+  terminal: {
+    agwReady: "AGW آمادهٔ ورود",
+    agwOn: "AGW متصل",
+    gateTitle: "ترمینال، پشت دروازهٔ AGW",
+    gateBody: "برای دیدن سیگنال امروز با کیف پول جهانی Abstract وارد شوید — بدون نصب هیچ افزونه‌ای؛ ایمیل، کد QR یا اکانت اجتماعی کافی است.",
+    gateBtn: "ورود با کیف پول Abstract",
+    why1: "بدون افزونه — کیف پول هوشمند، درون مرورگر شما",
+    why2: "گس رایگان — حمایت‌شده توسط Paymaster شبکهٔ Abstract",
+    why3: "پرداخت مستقیم به خزانهٔ عمومی پروژه — قابل رصد در Abscan",
+    gasFree: "کارمزد گس: ۰ — توسط Paymaster شبکهٔ Abstract اسپانسر می‌شود",
+    smartWallet: "کیف پول هوشمند AGW",
+    foundation: "لایهٔ بنیادین امنیت",
+    dailySignal: "سیگنال امروز",
+    dailyBody: "یک PENGU برای ۲۴ ساعت دسترسی به سیگنال روزانه — سبک‌ترین راه آزمودن موتور تحلیل.",
+    dailyReset: "بازنشانی روزانه (UTC)",
+    unlock: "بازکردن با {n} PENGU",
+    otherPlans: "سایر تعرفه‌ها و اشتراک‌ها",
+  },
   toast: { copied: "کپی شد", paid: "پرداخت تأیید و دسترسی فعال شد", verified: "تراکنش معتبر است — دسترسی بازموند", payFail: "پرداخت ناموفق بود", renewed: "تمدید با موفقیت انجام شد" },
 };
 
@@ -640,6 +676,24 @@ const en: Dict = {
     docs: "Technical docs (README + docs/)",
     portal: "Register on Abstract Portal",
     rights: "© {y} Pengu Pulse — open & auditable",
+  },
+  terminal: {
+    agwReady: "AGW ready to sign in",
+    agwOn: "AGW connected",
+    gateTitle: "The terminal lives behind the AGW gate",
+    gateBody: "Sign in with your Abstract Global Wallet to unlock today's signal — no extension to install; email, QR code or a social account is enough.",
+    gateBtn: "Sign in with Abstract",
+    why1: "No extension — a smart wallet right in your browser",
+    why2: "Gas-free — sponsored by the Abstract network paymaster",
+    why3: "Payments go straight to the public project treasury — trackable on Abscan",
+    gasFree: "Gas fee: 0 — sponsored by the Abstract network paymaster",
+    smartWallet: "AGW smart wallet",
+    foundation: "Security foundation layer",
+    dailySignal: "Today's signal",
+    dailyBody: "One PENGU for 24 hours of daily-signal access — the lightest way to try the engine.",
+    dailyReset: "Daily reset (UTC)",
+    unlock: "Unlock for {n} PENGU",
+    otherPlans: "Other plans & subscriptions",
   },
   toast: { copied: "Copied", paid: "Payment confirmed — access active", verified: "Valid transaction — access restored", payFail: "Payment failed", renewed: "Renewed successfully" },
 };

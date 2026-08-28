@@ -1,12 +1,17 @@
 /**
- * کیف پول، پرداخت، تعرفه‌ها، راستی‌آزمایی و وضعیت دسترسی
+ * لایهٔ کیف پول و پرداخت — Abstract Global Wallet (AGW)
+ * ------------------------------------------------------------------
+ * AGW یک کیف پول هوشمند (Smart Contract Wallet) با Account Abstraction
+ * بومیِ Abstract است؛ کاربر بدون نصب هیچ افزونه‌ای (ایمیل/QR/اجتماعی)
+ * وارد می‌شود. ورود با useLoginWithAbstract، وضعیت با useAccount و
+ * پرداخت با abstractClient.sendTransaction انجام می‌شود؛ گس تراکنش‌ها
+ * توسط Paymaster شبکهٔ Abstract اسپانسر می‌شود.
  */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { ABSTRACT, PENGU, PLANS, TREASURY, fmt, planById, type Plan, type PlanId } from "../config";
 import { useI18n } from "../i18n";
 import {
   ChainError,
-  bestAccess,
   confirmAndGrant,
   explorerAddr,
   explorerTx,
@@ -14,25 +19,19 @@ import {
   readAutoRenew,
   saveGrantFor,
   sendPaymentViaAgw,
-  treasuryAddress,
   verifyTxHash,
   writeAutoRenew,
   type AccessGrant,
 } from "../lib/chain";
-import { IcCheck, IcCopy, IcExternal, IcLock, IcRefresh, IcSearch, IcShield, IcWallet, IcX } from "./icons";
+import { IcBolt, IcChain, IcCheck, IcCopy, IcExternal, IcLock, IcRefresh, IcSearch, IcShield, IcWallet, IcX } from "./icons";
 import { Section, planName } from "./panels";
 import type { Address } from "viem";
 import { parseUnits } from "viem";
-import { useLoginWithAbstract, useAbstractClient } from "@abstract-foundation/agw-react";
+import { useAbstractClient, useLoginWithAbstract } from "@abstract-foundation/agw-react";
 import { useAccount } from "wagmi";
 import type { AbstractClient } from "@abstract-foundation/agw-client";
 
-/* ------------------------------- useWallet ------------------------------
- * ورود و امضا تماماً توسط Abstract Global Wallet (AGW) انجام می‌شود.
- * AGW یک کیف پول هوشمند درون‌مرورگری است؛ کاربر با ایمیل/QR/اکانت اجتماعی
- * وارد می‌شود و نیازی به نصب هیچ افزونه‌ای ندارد. وضعیت اتصال از wagmi
- * (useAccount) و کلاینت پرداخت از useAbstractClient می‌آید.
- */
+/* ------------------------------- useWallet ------------------------------ */
 export interface WalletApi {
   status: "idle" | "connecting" | "connected";
   address: Address | null;
@@ -93,32 +92,32 @@ export function WalletButton({ wallet, notify }: { wallet: WalletApi; notify: (m
   if (wallet.status === "connected" && wallet.address) {
     return (
       <div className="relative">
-        <button onClick={() => setOpen((v) => !v)} className="btn-press flex items-center gap-2.5 rounded-lg border border-gain/40 bg-gain/10 px-3.5 py-2.5 font-mono text-[13px] font-semibold text-gain">
+        <button onClick={() => setOpen((v) => !v)} className="btn-press flex items-center gap-2.5 rounded-lg border border-gain/40 bg-gain/10 py-2 pe-2.5 ps-3.5 font-mono text-[13px] font-semibold text-gain">
           <span className="relative flex h-2 w-2">
             <span className="pp-ping absolute inline-flex h-full w-full rounded-full bg-gain" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-gain" />
           </span>
           <span dir="ltr">{fmt.addr(wallet.address)}</span>
+          <span className="rounded-md border border-ice/45 bg-ice/10 px-1.5 py-0.5 text-[10px] font-bold tracking-widest text-ice">AGW</span>
         </button>
         {open && (
           <div className="absolute end-0 z-50 mt-2 w-64 rounded-xl border border-line bg-panel p-4 shadow-lift">
-            <p className="text-[11px] text-faint">{t.status.balance} {PENGU.symbol}</p>
-            <p className="font-mono text-xl font-bold text-snow tabular">{wallet.balance === null ? "…" : fmt.pengu(wallet.balance)}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] text-faint">{t.terminal.smartWallet}</p>
+              <span className="font-mono text-[10px] tracking-widest text-ice">ABSTRACT #{ABSTRACT.id}</span>
+            </div>
+            <p className="mt-1 font-mono text-xl font-bold text-snow tabular">
+              {wallet.balance === null ? "…" : fmt.pengu(wallet.balance)} <span className="text-[12px] text-beak">{PENGU.symbol}</span>
+            </p>
             <div className="mt-3 space-y-1.5 text-[13px]">
               <button onClick={() => void copy(wallet.address!)} className="flex w-full items-center justify-between rounded-lg bg-ink/70 px-3 py-2 text-fog transition-colors hover:text-snow">
                 <span dir="ltr" className="font-mono text-[12px]">{fmt.addr(wallet.address)}</span>
                 <IcCopy size={15} />
               </button>
               <a href={explorerAddr(wallet.address)} target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-lg bg-ink/70 px-3 py-2 text-fog transition-colors hover:text-snow">
-                Abscan <IcExternal size={15} />
+                {ABSTRACT.explorerName} <IcExternal size={15} />
               </a>
-              <button
-                onClick={() => {
-                  wallet.refreshBalance();
-                  setOpen(false);
-                }}
-                className="flex w-full items-center justify-between rounded-lg bg-ink/70 px-3 py-2 text-fog transition-colors hover:text-snow"
-              >
+              <button onClick={() => { wallet.refreshBalance(); setOpen(false); }} className="flex w-full items-center justify-between rounded-lg bg-ink/70 px-3 py-2 text-fog transition-colors hover:text-snow">
                 {t.status.refresh} <IcRefresh size={15} />
               </button>
               <button onClick={() => { wallet.disconnect(); setOpen(false); }} className="flex w-full items-center justify-between rounded-lg bg-loss/10 px-3 py-2 font-semibold text-loss transition-colors hover:bg-loss/20">
@@ -145,9 +144,45 @@ export function WalletButton({ wallet, notify }: { wallet: WalletApi; notify: (m
         )}
         {wallet.status === "connecting" ? t.status.connecting : t.status.connectWallet}
       </button>
-      <span className="pointer-events-none absolute end-0 top-full z-50 mt-2 hidden w-56 rounded-lg border border-line bg-abyss/95 p-2.5 text-[11.5px] leading-5 text-fog group-hover:block">
+      <span className="pointer-events-none absolute end-0 top-full z-50 mt-2 hidden w-60 rounded-lg border border-line bg-abyss/95 p-2.5 text-[11.5px] leading-5 text-fog group-hover:block">
         {t.status.loginHint}
       </span>
+    </div>
+  );
+}
+
+/* -------------------------------- AgwGate ------------------------------- */
+export function AgwGate({ wallet }: { wallet: WalletApi }) {
+  const { t } = useI18n();
+  const reasons = [
+    { icon: <IcWallet size={16} />, text: t.terminal.why1 },
+    { icon: <IcBolt size={16} />, text: t.terminal.why2 },
+    { icon: <IcChain size={16} />, text: t.terminal.why3 },
+  ];
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-ice/35 bg-panel/85 p-6">
+      <div className="pointer-events-none absolute -start-10 -top-10 h-36 w-36 rounded-full bg-ice/10 blur-2xl" aria-hidden />
+      <p className="font-mono text-[11.5px] tracking-[0.22em] text-ice">▚ {t.terminal.gateTitle}</p>
+      <p className="mt-2.5 max-w-md text-[13.5px] leading-7 text-fog">{t.terminal.gateBody}</p>
+      <button
+        onClick={() => wallet.connect()}
+        disabled={wallet.status === "connecting"}
+        className="btn-press pp-ring mt-5 flex items-center gap-2.5 rounded-xl bg-ice px-6 py-3.5 text-[15px] font-black text-ink hover:bg-frost disabled:opacity-60"
+      >
+        {wallet.status === "connecting" ? (
+          <span className="pp-spin inline-block h-4.5 w-4.5 rounded-full border-2 border-ink/30 border-t-ink" />
+        ) : (
+          <IcWallet size={19} />
+        )}
+        {wallet.status === "connecting" ? t.status.connecting : t.terminal.gateBtn}
+      </button>
+      <ul className="mt-5 space-y-2">
+        {reasons.map((r, i) => (
+          <li key={i} className="flex items-center gap-2.5 text-[12.5px] text-fog">
+            <span className="text-beak">{r.icon}</span> {r.text}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -184,8 +219,7 @@ export function PayModal({
   };
 
   const start = async () => {
-    if (!wallet.address) return;
-    if (!wallet.abstractClient) throw new ChainError("NETWORK", "AGW client not ready");
+    if (!wallet.address || !wallet.abstractClient) return;
     setErrCode(null);
     setStep("signing");
     try {
@@ -214,13 +248,15 @@ export function PayModal({
     <div className="fixed inset-0 z-[90] flex items-center justify-center bg-abyss/85 p-4 backdrop-blur-sm" onClick={step === "signing" || step === "confirming" ? undefined : onClose}>
       <div className="w-full max-w-md rounded-2xl border border-line bg-panel p-6 shadow-lift" onClick={(e) => e.stopPropagation()}>
         <div className="mb-5 flex items-center justify-between">
-          <h3 className="font-display text-2xl text-snow">{t.pay.title}</h3>
+          <h3 className="flex items-center gap-2.5 font-display text-2xl text-snow">
+            {t.pay.title}
+            <span className="rounded-md border border-ice/45 bg-ice/10 px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-widest text-ice">AGW</span>
+          </h3>
           {step !== "signing" && step !== "confirming" && (
             <button onClick={onClose} className="rounded-lg p-1.5 text-faint transition-colors hover:bg-ink hover:text-snow"><IcX size={18} /></button>
           )}
         </div>
 
-        {/* مراحل */}
         <div className="mb-6 flex items-center gap-1.5">
           {steps.map((s, i) => (
             <div key={s.id} className="flex flex-1 items-center gap-1.5">
@@ -248,6 +284,10 @@ export function PayModal({
                 <span className="text-fog">{t.pay.network}</span>
                 <span className="font-mono text-ice">{ABSTRACT.name} · #{ABSTRACT.id}</span>
               </div>
+              <div className="flex items-center justify-between">
+                <span className="text-fog">Gas</span>
+                <span className="font-mono font-bold text-gain">0 ETH ✓</span>
+              </div>
               <div>
                 <span className="text-fog">{t.pay.recipient}</span>
                 <a href={explorerAddr(TREASURY)} target="_blank" rel="noreferrer" dir="ltr" className="mt-1 block break-all font-mono text-[11.5px] text-frost underline-offset-4 hover:underline">
@@ -255,15 +295,17 @@ export function PayModal({
                 </a>
               </div>
             </div>
+            <p className="mt-3 flex items-start gap-2 rounded-lg border border-gain/30 bg-gain/8 px-3 py-2.5 text-[12px] leading-5 text-gain">
+              <IcBolt size={15} className="mt-0.5 shrink-0" /> {t.terminal.gasFree}
+            </p>
             {insufficient && (
               <p className="mt-3 rounded-lg border border-loss/40 bg-loss/10 px-3 py-2 text-[12.5px] text-loss">
                 {t.pay.insufficient} — {t.pay.need}: <b className="font-mono">{plan.price} {PENGU.symbol}</b>
               </p>
             )}
-            <p className="mt-3 text-[11.5px] text-faint">{t.pay.steps}: {PENGU.symbol} (ERC-20) → {t.footer.treasury}. {t.plans.networkFee}</p>
             <button
               onClick={() => void start()}
-              disabled={insufficient || wallet.status !== "connected"}
+              disabled={insufficient || wallet.status !== "connected" || !wallet.abstractClient}
               className="btn-press mt-5 w-full rounded-xl bg-beak py-3.5 text-[15px] font-black text-ink hover:bg-frost disabled:cursor-not-allowed disabled:opacity-50"
             >
               {wallet.status !== "connected" ? t.status.connectWallet : t.pay.confirm}
@@ -310,7 +352,7 @@ export function PayModal({
               <a href={explorerTx(txHash)} target="_blank" rel="noreferrer" dir="ltr" className="mt-2 inline-block font-mono text-[11.5px] text-ice underline-offset-4 hover:underline">{fmt.addr(txHash)} ↗</a>
             )}
             <div className="mt-5 flex gap-2">
-              <button onClick={() => { setStep("review"); }} className="btn-press flex-1 rounded-xl border border-line bg-ink py-3 text-[13px] font-bold text-snow hover:border-beak/50">{t.pay.retry}</button>
+              <button onClick={() => setStep("review")} className="btn-press flex-1 rounded-xl border border-line bg-ink py-3 text-[13px] font-bold text-snow hover:border-beak/50">{t.pay.retry}</button>
               <button onClick={onClose} className="btn-press flex-1 rounded-xl bg-panel2 py-3 text-[13px] font-bold text-fog">{t.pay.close}</button>
             </div>
           </div>
@@ -320,9 +362,21 @@ export function PayModal({
   );
 }
 
-
-
 /* ------------------------------- PlansPanel ----------------------------- */
+function useUtcCountdown(): string {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const iv = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(iv);
+  }, []);
+  const next = Date.UTC(new Date(now).getUTCFullYear(), new Date(now).getUTCMonth(), new Date(now).getUTCDate() + 1);
+  const ms = Math.max(0, next - now);
+  const h = Math.floor(ms / 3_600_000);
+  const m = Math.floor((ms % 3_600_000) / 60_000);
+  const s = Math.floor((ms % 60_000) / 1000);
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
 export function PlansPanel({
   wallet,
   access,
@@ -337,71 +391,127 @@ export function PlansPanel({
   const { t } = useI18n();
   const [autoRenew, setAutoRenew] = useState(() => readAutoRenew()?.enabled ?? false);
   const [renewPlan, setRenewPlan] = useState<PlanId>(() => readAutoRenew()?.planId ?? "full");
+  const countdown = useUtcCountdown();
+  void notify;
 
-  const toggle = (v: boolean, plan?: PlanId) => {
+  const featured = PLANS.find((p) => p.id === "signal")!;
+  const rows = PLANS.filter((p) => p.id !== "signal");
+
+  const toggle = (v: boolean, plan: PlanId) => {
     setAutoRenew(v);
-    if (plan) setRenewPlan(plan);
-    writeAutoRenew(v ? { enabled: v, planId: plan ?? renewPlan } : null);
-    void notify;
+    setRenewPlan(plan);
+    writeAutoRenew(v ? { enabled: v, planId: plan } : null);
   };
 
   return (
-    <Section id="plans" kicker="ACCESS & TARIFF" title={t.plans.title} body={t.plans.body} icon={<IcWallet size={30} />}>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {PLANS.map((p, i) => {
-          const name = planName(t, p.id);
-          const desc = p.id === "signal" ? t.plans.signalDesc : p.id === "full" ? t.plans.fullDesc : p.id === "week" ? t.plans.weekDesc : t.plans.monthDesc;
-          const features = p.tier === 1 ? t.plans.featureSignal : t.plans.featureFull;
-          const active = access?.planId === p.id;
-          return (
-            <div key={p.id} className={`card-lift relative flex flex-col rounded-2xl border p-5 ${p.popular ? "border-beak/60 bg-panel2/80" : "border-line bg-panel/70"}`} style={{ transitionDelay: `${i * 40}ms` }}>
-              {p.popular && (
-                <span className="absolute -top-3 start-4 rounded-md bg-beak px-2.5 py-0.5 text-[11px] font-black text-ink">{t.plans.popular}</span>
-              )}
-              {p.subscription && (
-                <span className="absolute -top-3 start-4 rounded-md bg-ice px-2.5 py-0.5 text-[11px] font-black text-ink">{t.plans.subscription}</span>
-              )}
-              <h3 className="font-display text-[22px] text-snow">{name}</h3>
-              <p className="text-[12.5px] text-fog">{desc}</p>
-              <p className="mt-4 font-mono text-[34px] font-bold leading-none text-snow tabular">
-                {p.price}
-                <span className="ms-2 text-[15px] font-semibold text-beak">{PENGU.symbol}</span>
-              </p>
-              <p className="mt-1 font-mono text-[11.5px] text-faint">{t.plans.duration}: {t.plans.hours(p.hours)}</p>
-              <ul className="mt-4 flex-1 space-y-2">
-                {features.map((f, j) => (
-                  <li key={j} className="flex items-start gap-2 text-[12.5px] leading-5 text-fog">
-                    <IcCheck size={14} className="mt-0.5 shrink-0 text-gain" /> {f}
-                  </li>
-                ))}
-              </ul>
-              {p.subscription && (
-                <label className="mt-3 flex cursor-pointer items-center gap-2 rounded-lg bg-ink/60 px-3 py-2 text-[12px] text-fog">
-                  <input
-                    type="checkbox"
-                    checked={autoRenew && renewPlan === p.id}
-                    onChange={(e) => toggle(e.target.checked, p.id)}
-                    className="h-4 w-4 accent-[#FF9E2C]"
-                  />
-                  {t.plans.autoRenew}
-                </label>
-              )}
-              <button
-                onClick={() => onPay(p)}
-                className={`btn-press mt-4 w-full rounded-xl py-3 text-[13.5px] font-black ${active ? "bg-gain/15 text-gain" : p.popular ? "bg-beak text-ink hover:bg-frost" : "border border-line bg-ink text-snow hover:border-beak/50 hover:text-beak"}`}
-              >
-                {active ? `✓ ${t.access.plan}` : t.plans.pay.replace("{n}", p.price)}
-              </button>
+    <Section id="plans" num="02" kicker="ACCESS & TARIFF" title={t.plans.title} body={t.plans.body} icon={<IcWallet size={30} />}>
+      <div className="grid gap-5 lg:grid-cols-5">
+        {/* تعرفهٔ ویژه — سیگنال امروز */}
+        <RevealFeatured>
+          <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-beak/55 bg-gradient-to-b from-panel2 to-panel p-6">
+            <span className="absolute -top-3 start-5 rounded-md bg-beak px-2.5 py-0.5 text-[11px] font-black text-ink">{t.plans.popular}</span>
+            <div className="pointer-events-none absolute -end-14 -top-14 h-44 w-44 rounded-full bg-beak/10 blur-3xl" aria-hidden />
+            <h3 className="font-display text-[26px] text-snow">{t.terminal.dailySignal}</h3>
+            <p className="mt-1 text-[13px] leading-6 text-fog">{t.terminal.dailyBody}</p>
+            <p className="mt-5 font-mono text-[56px] font-bold leading-none text-beak tabular">
+              1<span className="ms-2 text-[18px] font-semibold text-snow/80">{PENGU.symbol}</span>
+            </p>
+            <div className="mt-4 flex items-center gap-3 rounded-xl border border-line bg-abyss/60 px-4 py-3">
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="pp-ping absolute h-full w-full rounded-full bg-beak" />
+                <span className="relative h-2 w-2 rounded-full bg-beak" />
+              </span>
+              <div>
+                <p className="text-[11px] text-faint">{t.terminal.dailyReset}</p>
+                <p className="font-mono text-[17px] font-bold text-snow tabular" dir="ltr">{countdown}</p>
+              </div>
             </div>
-          );
-        })}
+            <ul className="mt-4 flex-1 space-y-2">
+              {t.plans.featureSignal.map((f, i) => (
+                <li key={i} className="flex items-start gap-2 text-[12.5px] leading-5 text-fog">
+                  <IcCheck size={14} className="mt-0.5 shrink-0 text-gain" /> {f}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => onPay(featured)}
+              className={`btn-press mt-5 w-full rounded-xl py-3.5 text-[14.5px] font-black ${access?.planId === "signal" ? "bg-gain/15 text-gain" : "bg-beak text-ink hover:bg-frost"}`}
+            >
+              {access?.planId === "signal" ? `✓ ${t.access.plan}` : t.terminal.unlock.replace("{n}", featured.price)}
+            </button>
+            <p className="mt-3 flex items-center gap-1.5 text-[11.5px] text-faint"><IcBolt size={13} className="text-gain" /> {t.terminal.gasFree}</p>
+          </div>
+        </RevealFeatured>
+
+        {/* سایر تعرفه‌ها — ردیف‌های کنسول */}
+        <div className="lg:col-span-3">
+          <p className="mb-3 font-mono text-[12px] tracking-[0.2em] text-faint">▤ {t.terminal.otherPlans}</p>
+          <div className="space-y-3">
+            {rows.map((p, i) => {
+              const name = planName(t, p.id);
+              const desc = p.id === "full" ? t.plans.fullDesc : p.id === "week" ? t.plans.weekDesc : t.plans.monthDesc;
+              const active = access?.planId === p.id;
+              return (
+                <div key={p.id} className="plan-row relative rounded-xl border border-line bg-panel/70 p-4 sm:p-5" style={{ transitionDelay: `${i * 30}ms` }}>
+                  {p.popular && p.id !== "signal" && (
+                    <span className="absolute -top-2.5 end-5 rounded-md bg-ice px-2 py-0.5 text-[10.5px] font-black text-ink">{t.plans.popular}</span>
+                  )}
+                  {p.subscription && (
+                    <span className="absolute -top-2.5 end-5 rounded-md bg-ice/90 px-2 py-0.5 text-[10.5px] font-black text-ink">{t.plans.subscription}</span>
+                  )}
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-display text-[20px] text-snow">{name}</h3>
+                      <p className="mt-0.5 text-[12.5px] text-fog">{desc}</p>
+                      <ul className="mt-2.5 hidden gap-x-5 gap-y-1 sm:flex sm:flex-wrap">
+                        {(p.tier === 1 ? t.plans.featureSignal : t.plans.featureFull).slice(0, 3).map((f, j) => (
+                          <li key={j} className="flex items-center gap-1.5 text-[11.5px] text-faint">
+                            <IcCheck size={12} className="text-gain" /> {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="text-end">
+                      <p className="font-mono text-[26px] font-bold leading-none text-snow tabular">
+                        {p.price}<span className="ms-1.5 text-[13px] font-semibold text-beak">{PENGU.symbol}</span>
+                      </p>
+                      <p className="mt-1 font-mono text-[11px] text-faint">{t.plans.duration}: {t.plans.hours(p.hours)}</p>
+                    </div>
+                    <button
+                      onClick={() => onPay(p)}
+                      className={`btn-press pp-arrow flex items-center gap-2 rounded-xl px-5 py-3 text-[13px] font-black ${active ? "bg-gain/15 text-gain" : "border border-line bg-ink text-snow hover:border-beak/60 hover:text-beak"}`}
+                    >
+                      {active ? `✓ ${t.access.plan}` : t.terminal.unlock.replace("{n}", p.price)}
+                    </button>
+                  </div>
+                  {p.subscription && (
+                    <label className="mt-3 flex w-fit cursor-pointer items-center gap-2 rounded-lg bg-ink/60 px-3 py-1.5 text-[12px] text-fog transition-colors hover:text-snow">
+                      <input
+                        type="checkbox"
+                        checked={autoRenew && renewPlan === p.id}
+                        onChange={(e) => toggle(e.target.checked, p.id)}
+                        className="h-4 w-4 accent-[#FF9E2C]"
+                      />
+                      {t.plans.autoRenew}
+                    </label>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-4 flex items-start gap-2 text-[12.5px] leading-6 text-faint">
+            <IcShield size={16} className="mt-0.5 shrink-0 text-gain" />
+            {t.plans.autoRenewHint}
+          </p>
+        </div>
       </div>
-      <p className="mt-5 flex items-start gap-2 text-[12.5px] leading-6 text-faint">
-        <IcShield size={16} className="mt-0.5 shrink-0 text-gain" />
-        {t.plans.autoRenewHint}
-      </p>
     </Section>
   );
+}
+
+import { Reveal } from "./display";
+function RevealFeatured({ children }: { children: ReactNode }) {
+  return <Reveal delay={80} className="lg:col-span-2">{children}</Reveal>;
 }
 
 /* ------------------------------- VerifyPanel ---------------------------- */
@@ -436,7 +546,7 @@ export function VerifyPanel({ notify }: { notify: (m: string) => void }) {
   };
 
   return (
-    <Section id="verify" kicker="ON-CHAIN PROOF" title={t.verify.title} body={t.verify.body} icon={<IcSearch size={30} />}>
+    <Section id="verify" num="03" kicker="ON-CHAIN PROOF" title={t.verify.title} body={t.verify.body} icon={<IcSearch size={30} />}>
       <div className="max-w-3xl rounded-2xl border border-line bg-panel/70 p-6">
         <div className="flex flex-col gap-2 sm:flex-row" dir="ltr">
           <input
@@ -471,7 +581,7 @@ export function VerifyPanel({ notify }: { notify: (m: string) => void }) {
             <a href={explorerTx(result.ok.grant.txHash)} target="_blank" rel="noreferrer" dir="ltr" className="mt-3 inline-flex items-center gap-1.5 font-mono text-[12px] text-ice hover:underline">
               {fmt.addr(result.ok.grant.txHash)} <IcExternal size={13} />
             </a>
-            <p className="mt-3 text-[12px] text-faint">{t.verify.savedFor}.</p>
+            <p className="mt-3 text-[12px] text-faint">{t.verify.savedFor}</p>
           </div>
         )}
       </div>
@@ -545,5 +655,3 @@ export function AccessCard({
     </div>
   );
 }
-
-

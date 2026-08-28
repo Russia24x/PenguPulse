@@ -3,7 +3,7 @@
  * ترکیب: دادهٔ زندهٔ بازار → موتور تحلیل → دروازهٔ دسترسی روی‌زنجیره‌ای
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import { APP, PENGU, fmt, planById, type Plan } from "./config";
+import { ABSTRACT, APP, PENGU, fmt, planById, type Plan } from "./config";
 import { I18nProvider, useI18n } from "./i18n";
 import { analyze } from "./lib/ta";
 import { fetchMarket, type MarketBundle } from "./lib/market";
@@ -11,13 +11,58 @@ import { bestAccess, fetchBlockNumber, readAutoRenew, type AccessGrant } from ".
 import { Mascot, PenguLogo, IcBolt, IcCandles, IcCompass, IcGlobe, IcPulse, IcRefresh, IcSnow } from "./components/icons";
 import { PriceChart, Reveal, SignalGauge, SnowCanvas, TickerTape, type TickerItem } from "./components/display";
 import { Footer, IndicatorPanel, MethodPanel, RiskPanel, SecurityPanel } from "./components/panels";
-import { AccessCard, PayModal, PlansPanel, VerifyPanel, WalletButton, useWallet } from "./components/wallet";
+import { AccessCard, AgwGate, PayModal, PlansPanel, VerifyPanel, WalletButton, useWallet, type WalletApi } from "./components/wallet";
 import { AbstractWalletProvider } from "@abstract-foundation/agw-react";
 import { abstractChain } from "./lib/chain";
 
 interface MarketState {
   status: "loading" | "live" | "error";
   bundle: MarketBundle | null;
+}
+
+/* ------------------------------ BootStrip ------------------------------
+ * نوار وضعیت زندهٔ ترمینال: وضعیت AGW، بلوک، فید داده، نسخهٔ موتور
+ */
+function BootStrip({ wallet, blockNum, dataHash, stale }: { wallet: WalletApi; blockNum: bigint | null; dataHash?: string; stale?: boolean }) {
+  const { t } = useI18n();
+  return (
+    <div className="border-b border-line/60 bg-ink/60">
+      <div dir="ltr" className="mx-auto flex w-full max-w-6xl items-center gap-2.5 overflow-x-auto whitespace-nowrap px-4 py-2 font-mono text-[11px] tracking-wider text-faint">
+        <span className="flex items-center gap-1.5">
+          <span className={`inline-block h-1.5 w-1.5 rounded-full ${wallet.status === "connected" ? "bg-gain" : "bg-beak"}`} />
+          <span className={wallet.status === "connected" ? "text-gain" : "text-beak"}>
+            {wallet.status === "connected" && wallet.address ? `AGW:${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}` : "AGW:READY"}
+          </span>
+        </span>
+        <span aria-hidden>·</span>
+        <span className="text-ice">ABS#{ABSTRACT.id}</span>
+        <span aria-hidden>·</span>
+        <span className="tabular">{t.status.block} {blockNum !== null ? `#${blockNum.toLocaleString("en-US")}` : "…"}</span>
+        <span aria-hidden>·</span>
+        <span className={stale ? "text-beak" : ""}>FEED:CG{dataHash ? `#${dataHash}` : ""}{stale ? "(CACHE)" : ""}</span>
+        <span aria-hidden>·</span>
+        <span>ENGINE:v{APP.engineVersion}</span>
+        <span className="pp-caret inline-block h-3 w-1.5 bg-ice/80" aria-hidden />
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------- Spark ---------------------------------
+ * اسپارک‌لاین کوچک از آخرین بسته‌شدن‌های کندل
+ */
+function Spark({ values, tone }: { values: number[]; tone: "gain" | "loss" | "ice" }) {
+  if (values.length < 2) return null;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const pts = values.map((v, i) => `${(i / (values.length - 1)) * 100},${26 - ((v - min) / span) * 22 + 1}`).join(" ");
+  const cls = tone === "gain" ? "text-gain" : tone === "loss" ? "text-loss" : "text-ice";
+  return (
+    <svg viewBox="0 0 100 28" preserveAspectRatio="none" className={`h-7 w-24 ${cls}`} aria-hidden>
+      <polyline points={pts} fill="none" stroke="currentColor" strokeWidth="2" pathLength={300} style={{ ["--dash" as string]: 300 }} className="pp-spark" />
+    </svg>
+  );
 }
 
 function AppInner() {
@@ -201,6 +246,8 @@ function AppInner() {
           </div>
         </header>
 
+        <BootStrip wallet={wallet} blockNum={blockNum} dataHash={market.bundle?.dataHash} stale={market.bundle?.stale} />
+
         {/* --------------------------- Opening terminal ------------------------ */}
         <main>
           <section id="signal" className="relative mx-auto w-full max-w-6xl scroll-mt-20 px-4 pb-10 pt-10 sm:pt-14">
@@ -208,8 +255,11 @@ function AppInner() {
               {/* ستون سیگنال */}
               <div className="lg:col-span-5">
                 <Reveal>
-                  <p className="flex items-center gap-2 font-mono text-[12px] tracking-[0.18em] text-beak">
-                    <IcPulse size={16} /> {t.hero.kicker}
+                  <p className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[12px] tracking-[0.18em] text-beak">
+                    <span className="flex items-center gap-2"><IcPulse size={16} /> {t.hero.kicker}</span>
+                    <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold tracking-widest ${wallet.status === "connected" ? "border-gain/45 bg-gain/10 text-gain" : "border-ice/45 bg-ice/10 text-ice"}`}>
+                      {wallet.status === "connected" ? t.terminal.agwOn : t.terminal.agwReady}
+                    </span>
                   </p>
                   <h1 className="mt-3 font-display leading-[1.06]">
                     <span className="block text-[52px] text-snow sm:text-[68px]">{t.hero.title1}</span>
@@ -249,9 +299,17 @@ function AppInner() {
                           </p>
                         </div>
                         <div className="pb-2">
-                          <span className={`rounded-lg px-3 py-1.5 font-mono text-[13.5px] font-bold tabular ${snap.change24h >= 0 ? "bg-gain/12 text-gain" : "bg-loss/12 text-loss"}`} dir="ltr">
-                            {fmt.pct(snap.change24h)}
-                          </span>
+                          <div className="flex items-center gap-3">
+                            <span className={`rounded-lg px-3 py-1.5 font-mono text-[13.5px] font-bold tabular ${snap.change24h >= 0 ? "bg-gain/12 text-gain" : "bg-loss/12 text-loss"}`} dir="ltr">
+                              {fmt.pct(snap.change24h)}
+                            </span>
+                            {market.bundle && (
+                              <Spark
+                                values={market.bundle.candles4h.slice(-40).map((c) => c.c)}
+                                tone={snap.change24h >= 0 ? "gain" : "loss"}
+                              />
+                            )}
+                          </div>
                           <p className="mt-1.5 flex items-center gap-1.5 font-mono text-[11px] text-faint">
                             <span className="relative flex h-1.5 w-1.5">
                               <span className="pp-ping absolute h-full w-full rounded-full bg-gain" />
@@ -322,8 +380,22 @@ function AppInner() {
                 </Reveal>
 
                 <Reveal delay={260}>
-                  <div className="mt-5">
-                    <AccessCard access={access} onRenew={onPay} />
+                  <div className="mt-5 space-y-4">
+                    {wallet.status !== "connected" ? (
+                      <AgwGate wallet={wallet} />
+                    ) : (
+                      <>
+                        <AccessCard access={access} onRenew={onPay} />
+                        {!access && (
+                          <button
+                            onClick={() => onPay(planById("signal"))}
+                            className="btn-press flex w-full items-center justify-center gap-2 rounded-xl bg-beak py-3.5 text-[14.5px] font-black text-ink hover:bg-frost"
+                          >
+                            <IcBolt size={18} /> {t.hero.ctaSignal}
+                          </button>
+                        )}
+                      </>
+                    )}
                   </div>
                 </Reveal>
               </div>

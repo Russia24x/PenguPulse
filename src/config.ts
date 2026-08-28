@@ -18,17 +18,17 @@ export const APP = {
   cacheTtlMs: 5 * 60_000,
 } as const;
 
-/** بلاکچین Abstract — Mainnet */
+/**
+ * بلاکچین Abstract — Mainnet
+ * تعریف رسمی زنجیره (chain object) از `viem/chains` وارد می‌شود؛ اینجا فقط
+ * متادیتای نمایشی/لینک‌ها نگهداری می‌شود تا هیچ دادهٔ زنجیره‌ای تکرار نشود.
+ */
 export const ABSTRACT = {
   id: 2741,
-  hexId: "0xab5",
   name: "Abstract",
-  testnet: false,
   rpcUrls: ["https://api.mainnet.abs.xyz", "https://api.abs.xyz"],
-  wsUrls: ["wss://api.mainnet.abs.xyz"],
   explorer: "https://abscan.org",
   explorerName: "Abscan",
-  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
 } as const;
 
 /** توکن PENGU روی Abstract (OFT — تأییدشده در Abscan و LayerZero) */

@@ -2,16 +2,17 @@
  * پنل‌های محتوایی ترمینال
  */
 import type { ReactNode } from "react";
-import { ABSTRACT, APP, ENGINE, PENGU, TREASURY, fmt, planById } from "../config";
+import { ABSTRACT, APP, ENGINE, PENGU, TREASURY } from "../config";
 import { useI18n, type Dict } from "../i18n";
 import type { Analysis, IndicatorResult, TimeframeAnalysis } from "../lib/ta";
-import { IcBolt, IcChain, IcCompass, IcDoc, IcFish, IcGauge, IcLock, IcShield, IcSnow } from "./icons";
+import { IcBolt, IcChain, IcCompass, IcDoc, IcFish, IcGauge, IcLock, IcShield, IcSnow, IcWallet } from "./icons";
 import { Reveal } from "./display";
 import { explorerAddr } from "../lib/chain";
 
 /* ------------------------------ Section ------------------------------ */
 export function Section({
   id,
+  num,
   kicker,
   title,
   body,
@@ -19,6 +20,7 @@ export function Section({
   icon,
 }: {
   id: string;
+  num?: string;
   kicker: string;
   title: string;
   body?: string;
@@ -28,13 +30,18 @@ export function Section({
   return (
     <section id={id} className="relative mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-16 sm:py-20">
       <Reveal>
-        <div className="mb-8 flex items-start gap-4">
-          {icon && <div className="mt-1 hidden shrink-0 text-ice sm:block">{icon}</div>}
-          <div>
-            <p className="mb-1 font-mono text-[12px] tracking-[0.22em] text-beak uppercase">{kicker}</p>
+        <div className="mb-8">
+          <p className="mb-2 flex items-center gap-3 font-mono text-[12px] tracking-[0.22em] text-beak uppercase">
+            {num && <span className="text-ice">{"//"}</span>}
+            {num && <span className="tabular">{num}</span>}
+            {kicker}
+          </p>
+          <div className="flex items-end gap-4">
+            {icon && <div className="mb-2 hidden shrink-0 text-ice sm:block">{icon}</div>}
             <h2 className="font-display text-3xl leading-tight text-snow sm:text-[40px]">{title}</h2>
-            {body && <p className="mt-3 max-w-3xl text-[15px] leading-8 text-fog">{body}</p>}
           </div>
+          <div className="pp-rule mt-4 h-px w-full bg-gradient-to-l from-line via-line to-transparent" />
+          {body && <p className="mt-4 max-w-3xl text-[15px] leading-8 text-fog">{body}</p>}
         </div>
       </Reveal>
       {children}
@@ -44,6 +51,56 @@ export function Section({
 
 const readingTone = (r: IndicatorResult["reading"]) =>
   r === "buy" ? "bg-gain/12 text-gain border-gain/40" : r === "sell" ? "bg-loss/12 text-loss border-loss/40" : "bg-ice/10 text-ice border-ice/35";
+
+/* --------------------------- VoteBar (رأی اندیکاتور) --------------------------- */
+function VoteBar({ vote, delay }: { vote: number; delay: number }) {
+  const w = Math.min(100, Math.abs(vote)) * 50;
+  return (
+    <div dir="ltr" className="relative h-2 w-full overflow-hidden rounded-full bg-ink">
+      <span className="absolute inset-y-0 left-1/2 w-px bg-line" aria-hidden />
+      <span
+        className={`pp-votegrow absolute inset-y-0 rounded-full ${vote >= 0 ? "left-1/2 bg-gain" : "right-1/2 bg-loss"}`}
+        style={{ width: `${w}%`, animationDelay: `${delay}ms` }}
+      />
+    </div>
+  );
+}
+
+function TfVoteBoard({ tf, t, limit }: { tf: TimeframeAnalysis; t: Dict; limit?: number }) {
+  const rows = limit ? tf.indicators.slice(0, limit) : tf.indicators;
+  const weightSum = rows.reduce((s, r) => s + r.weight, 0);
+  return (
+    <div className="overflow-hidden rounded-xl border border-line bg-panel/70">
+      <div className="flex items-center justify-between border-b border-line px-4 py-3">
+        <span className="font-mono text-sm font-semibold text-ice">{tf.label}</span>
+        <span className="font-mono text-[12px] text-fog">
+          {t.indicators.score}: <b className={tf.score >= 0 ? "text-gain" : "text-loss"}>{tf.score >= 0 ? "+" : ""}{tf.score.toFixed(1)}</b>
+          <span className="ms-2 text-faint">Σw = {weightSum}</span>
+        </span>
+      </div>
+      <ul>
+        {rows.map((r, i) => (
+          <li key={r.key} className="group border-t border-line/60 px-4 py-3.5 transition-colors first:border-t-0 hover:bg-panel2/60">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[13.5px] font-semibold text-snow">
+                {t.indicators[r.key]}
+                <span className="ms-2 text-[11.5px] font-normal text-faint">{t.indicators[noteKey(r.note)]}</span>
+              </p>
+              <span className={`shrink-0 rounded-md border px-2.5 py-0.5 text-[11.5px] font-bold ${readingTone(r.reading)}`}>
+                {r.reading === "buy" ? t.indicators.buy : r.reading === "sell" ? t.indicators.sell : t.indicators.neutral}
+              </span>
+            </div>
+            <div className="mt-2.5 flex items-center gap-3">
+              <span className="w-20 shrink-0 font-mono text-[12px] text-fog tabular" dir="ltr">{r.display}</span>
+              <VoteBar vote={r.vote} delay={120 + i * 70} />
+              <span className="w-9 shrink-0 text-end font-mono text-[11px] text-faint tabular" dir="ltr">w{r.weight}</span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 const NOTE_MAP: Record<
   IndicatorResult["note"],
@@ -62,70 +119,22 @@ const NOTE_MAP: Record<
 };
 const noteKey = (n: IndicatorResult["note"]) => NOTE_MAP[n];
 
-/* --------------------------- IndicatorTable --------------------------- */
-function TfTable({ tf, t, limit }: { tf: TimeframeAnalysis; t: Dict; limit?: number }) {
-  const rows = limit ? tf.indicators.slice(0, limit) : tf.indicators;
-  return (
-    <div className="overflow-x-auto rounded-xl border border-line bg-panel/70">
-      <div className="flex items-center justify-between border-b border-line px-4 py-3">
-        <span className="font-mono text-sm font-semibold text-ice">{tf.label}</span>
-        <span className="font-mono text-[12px] text-fog">
-          {t.indicators.score}: <b className={tf.score >= 0 ? "text-gain" : "text-loss"}>{tf.score >= 0 ? "+" : ""}{tf.score.toFixed(1)}</b>
-        </span>
-      </div>
-      <table className="w-full min-w-[560px] text-start text-[13.5px]">
-        <thead>
-          <tr className="text-faint">
-            <th className="px-4 py-2.5 text-start font-medium">{t.indicators.indicator}</th>
-            <th className="px-4 py-2.5 text-start font-medium">{t.indicators.value}</th>
-            <th className="px-4 py-2.5 text-start font-medium">{t.indicators.reading}</th>
-            <th className="px-4 py-2.5 text-start font-medium">{t.indicators.weight}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.key} className="border-t border-line/60 transition-colors hover:bg-panel2/60">
-              <td className="px-4 py-3 font-semibold text-snow">
-                {t.indicators[r.key]}
-                <span className="ms-2 text-[11.5px] font-normal text-faint">{t.indicators[noteKey(r.note)]}</span>
-              </td>
-              <td className="px-4 py-3 font-mono text-[12.5px] text-fog" dir="ltr">{r.display}</td>
-              <td className="px-4 py-3">
-                <span className={`inline-block rounded-md border px-2.5 py-1 text-[12px] font-bold ${readingTone(r.reading)}`}>
-                  {r.reading === "buy" ? t.indicators.buy : r.reading === "sell" ? t.indicators.sell : t.indicators.neutral}
-                </span>
-              </td>
-              <td className="px-4 py-3">
-                <span className="flex items-center gap-2 font-mono text-[12px] text-fog">
-                  <span className="h-1.5 w-14 overflow-hidden rounded-full bg-ink">
-                    <span className="block h-full rounded-full bg-beak" style={{ width: `${(r.weight / 18) * 100 * 0.9}%` }} />
-                  </span>
-                  {r.weight}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
+/* --------------------------- IndicatorPanel --------------------------- */
 export function IndicatorPanel({ analysis, tier }: { analysis: Analysis | null; tier: 0 | 1 | 2 }) {
   const { t } = useI18n();
   if (!analysis) return null;
   const [fast, slow] = analysis.timeframes;
   return (
-    <Section id="indicators" kicker="SIGNAL ENGINE" title={t.indicators.title} body={t.indicators.body} icon={<IcGauge size={30} />}>
+    <Section id="indicators" num="01" kicker="SIGNAL ENGINE" title={t.indicators.title} body={t.indicators.body} icon={<IcGauge size={30} />}>
       <div className="grid gap-5 lg:grid-cols-2">
         <Reveal delay={0}>
           <div className={tier === 0 ? "locked-blur" : ""}>
-            <TfTable tf={fast} t={t} limit={tier === 1 ? 5 : undefined} />
+            <TfVoteBoard tf={fast} t={t} limit={tier === 1 ? 5 : undefined} />
           </div>
         </Reveal>
         <Reveal delay={120}>
           {tier === 2 ? (
-            <TfTable tf={slow} t={t} />
+            <TfVoteBoard tf={slow} t={t} />
           ) : (
             <div className="relative flex h-full min-h-[260px] flex-col items-center justify-center rounded-xl border border-dashed border-line bg-panel/40 p-8 text-center">
               <IcLock size={34} className="text-faint" />
@@ -214,23 +223,49 @@ export function RiskPanel({ analysis, tier }: { analysis: Analysis | null; tier:
 /* ---------------------------- SecurityPanel ---------------------------- */
 export function SecurityPanel() {
   const { t } = useI18n();
-  const cards = [
-    { n: "01", icon: <IcShield size={26} />, title: t.security.p1t, body: t.security.p1b, tone: "text-gain border-gain/35" },
-    { n: "02", icon: <IcChain size={26} />, title: t.security.p2t, body: t.security.p2b, tone: "text-ice border-ice/35" },
-    { n: "03", icon: <IcBolt size={26} />, title: t.security.p3t, body: t.security.p3b, tone: "text-beak border-beak/35" },
+  const slabs = [
+    { n: "01", icon: <IcShield size={24} />, title: t.security.p1t, body: t.security.p1b, accent: "text-gain", bar: "bg-gain" },
+    { n: "02", icon: <IcChain size={24} />, title: t.security.p2t, body: t.security.p2b, accent: "text-ice", bar: "bg-ice" },
+    { n: "03", icon: <IcBolt size={24} />, title: t.security.p3t, body: t.security.p3b, accent: "text-beak", bar: "bg-beak" },
   ];
   return (
-    <Section id="security" kicker="SECURITY FIRST" title={t.security.title} body={t.security.body} icon={<IcShield size={30} />}>
-      <div className="grid gap-5 md:grid-cols-3">
-        {cards.map((c, i) => (
+    <Section id="security" num="04" kicker="SECURITY FIRST · ۱ و ۲ و ۳ = امنیت" title={t.security.title} body={t.security.body} icon={<IcShield size={30} />}>
+      {/* لایهٔ بنیادین: AGW */}
+      <Reveal>
+        <div className="relative overflow-hidden rounded-xl border border-ice/45 bg-gradient-to-l from-ice/12 via-panel/80 to-panel/80 p-6">
+          <div className="flex flex-wrap items-center gap-5">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-ice/40 bg-abyss/60 text-ice">
+              <IcWallet size={28} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="flex flex-wrap items-center gap-2.5 font-display text-[22px] text-snow">
+                {t.terminal.smartWallet}
+                <span className="rounded-md border border-ice/45 bg-ice/10 px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest text-ice">{t.terminal.foundation}</span>
+              </p>
+              <p className="mt-1.5 max-w-3xl text-[13.5px] leading-7 text-fog">
+                {t.terminal.why1} · {t.terminal.why2} · {t.terminal.why3}
+              </p>
+            </div>
+          </div>
+          <div className="pp-scanline pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-ice/10 to-transparent" aria-hidden />
+        </div>
+      </Reveal>
+      {/* سه اصل — چیدمان پلکانی */}
+      <div className="mt-5 space-y-4">
+        {slabs.map((c, i) => (
           <Reveal key={c.n} delay={i * 110}>
-            <div className={`card-lift h-full rounded-xl border bg-panel/70 p-6 ${c.tone.split(" ")[1]}`}>
-              <div className="flex items-center justify-between">
-                <span className={c.tone.split(" ")[0]}>{c.icon}</span>
-                <span className="font-display text-4xl text-line">{c.n}</span>
+            <div className={`card-lift relative overflow-hidden rounded-xl border border-line bg-panel/70 p-6 ${i === 1 ? "lg:ms-[5%]" : i === 2 ? "lg:ms-[10%]" : ""}`}>
+              <span className={`absolute inset-y-0 start-0 w-1 ${c.bar}`} aria-hidden />
+              <div className="flex items-start gap-5">
+                <span className={`mt-0.5 shrink-0 ${c.accent}`}>{c.icon}</span>
+                <div className="min-w-0">
+                  <h3 className="flex items-baseline gap-3 font-display text-[22px] leading-8 text-snow">
+                    <span className={`font-mono text-[13px] font-bold ${c.accent}`}>{c.n}</span>
+                    {c.title}
+                  </h3>
+                  <p className="mt-1.5 max-w-3xl text-[13.5px] leading-7 text-fog">{c.body}</p>
+                </div>
               </div>
-              <h3 className="mt-5 font-display text-[22px] leading-8 text-snow">{c.title}</h3>
-              <p className="mt-2 text-[13.5px] leading-7 text-fog">{c.body}</p>
             </div>
           </Reveal>
         ))}
@@ -250,17 +285,22 @@ export function SecurityPanel() {
 }
 
 /* ----------------------------- MethodPanel ----------------------------- */
+/** ترتیب ردیف‌های i18n دقیقاً مطابق ترتیب وزن‌های موتور است */
+const WEIGHT_ORDER: (keyof typeof ENGINE.weights)[] = [
+  "rsi", "macd", "trend", "bollinger", "stoch", "momentum", "volume", "structure",
+];
+
 export function MethodPanel() {
   const { t } = useI18n();
   return (
-    <Section id="method" kicker="METHODOLOGY" title={`${t.method.title} ${APP.engineVersion}`} body={t.method.body} icon={<IcFish size={30} />}>
+    <Section id="method" num="05" kicker="METHODOLOGY" title={`${t.method.title} ${APP.engineVersion}`} body={t.method.body} icon={<IcFish size={30} />}>
       <Reveal>
         <div className="grid gap-3 md:grid-cols-2">
-          {t.method.rows.map((r) => (
+          {t.method.rows.map((r, i) => (
             <div key={r.name} className="card-lift rounded-xl border border-line bg-panel/70 p-5">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="font-bold text-snow">{r.name}</h3>
-                <span className="rounded-md bg-ink px-2 py-0.5 font-mono text-[11px] text-beak">w = {ENGINE.weights[r.name === "RSI (Wilder)" ? "rsi" : r.name === "MACD" ? "macd" : r.name.startsWith("EMA") ? "trend" : r.name.startsWith("Bollinger") ? "bollinger" : r.name.startsWith("Stochastic") ? "stoch" : r.name === "ROC" ? "momentum" : r.name === "OBV" ? "volume" : "structure"]}</span>
+                <span className="rounded-md bg-ink px-2 py-0.5 font-mono text-[11px] text-beak">w = {ENGINE.weights[WEIGHT_ORDER[i]]}</span>
               </div>
               <p className="mt-3 overflow-x-auto whitespace-nowrap rounded-lg bg-abyss px-3 py-2 font-mono text-[12.5px] text-frost" dir="ltr">
                 {r.formula}
@@ -324,4 +364,3 @@ export function Footer() {
 
 export const planName = (t: Dict, id: string) =>
   id === "signal" ? t.plans.signal : id === "full" ? t.plans.full : id === "week" ? t.plans.week : t.plans.month;
-export { planById };
