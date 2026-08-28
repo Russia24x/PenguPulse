@@ -1,18 +1,18 @@
 /**
  * لایهٔ بلاکچین Abstract — امنیت در مرکز
  * ------------------------------------------------------------------
- * - هیچ کلید خصوصی‌ای در مرورگر لمس نمی‌شود؛ امضا فقط داخل کیف پول کاربر
- * - پرداخت = انتقال ERC-20 PENGU به خزانه + راستی‌آزمایی رسید تراکنش
- *   روی‌زنجیره (receipt + لاگ Transfer + مهر زمانی بلوک) — قابل آدرس‌دهی
- *   عمومی در Abscan و مستقل از هر بک‌اند
- * - کشف کیف پول با EIP-6963 (چندکیفی) + fallback به window.ethereum
+ * - ورود با Abstract Global Wallet (AGW): کیف پول هوشمند با Account
+ *   Abstraction بومی — بدون نیاز به نصب هیچ افزونه‌ای (ایمیل/QR/اجتماعی)
+ * - هیچ کلید خصوصی‌ای در مرورگر لمس نمی‌شود؛ امضا داخل AGW انجام می‌شود
+ * - پرداخت = انتقال ERC-20 PENGU به خزانه با abstractClient.sendTransaction
+ *   + راستی‌آزمایی رسید تراکنش روی‌زنجیره (receipt + لاگ Transfer +
+ *   مهر زمانی بلوک) — قابل آدرس‌دهی عمومی در Abscan و مستقل از هر بک‌اند
  * - ذخیرهٔ دسترسی‌ها فقط روی دستگاه کاربر (localStorage)؛ مرجع حقیقت
  *   همیشه زنجیره است و با هش تراکنش بازخوانی می‌شود
  */
 import {
   createPublicClient,
   decodeEventLog,
-  defineChain,
   encodeFunctionData,
   fallback,
   formatUnits,
@@ -22,20 +22,16 @@ import {
   parseUnits,
   type Address,
   type Hash,
-  type PublicClient,
 } from "viem";
+import { abstract } from "viem/chains";
+import type { AbstractClient } from "@abstract-foundation/agw-client";
 import { ABSTRACT, MIN_PAYMENT, PENGU, PLANS, TREASURY, type Plan, type PlanId } from "../config";
 
-export const abstractChain = defineChain({
-  id: ABSTRACT.id,
-  name: ABSTRACT.name,
-  nativeCurrency: ABSTRACT.nativeCurrency,
-  rpcUrls: { default: { http: [...ABSTRACT.rpcUrls], webSocket: [...ABSTRACT.wsUrls] } },
-  blockExplorers: { default: { name: ABSTRACT.explorerName, url: ABSTRACT.explorer } },
-});
+/** زنجیرهٔ استاندارد Abstract از viem — همان چیزی که AGW استفاده می‌کند */
+export { abstract as abstractChain };
 
-export const publicClient: PublicClient = createPublicClient({
-  chain: abstractChain,
+export const publicClient = createPublicClient({
+  chain: abstract,
   transport: fallback(ABSTRACT.rpcUrls.map((u) => http(u, { batch: false }))),
 });
 

@@ -16,10 +16,9 @@ export interface Dict {
     connectWallet: string;
     disconnect: string;
     connected: string;
-    wrongNetwork: string;
-    switchHint: string;
     connecting: string;
-    noWallet: string;
+    loginHint: string;
+    loginError: string;
     balance: string;
     engine: string;
     data: string;
@@ -214,13 +213,12 @@ const fa: Dict = {
     refresh: "تازه‌سازی",
     block: "بلوک",
     onAbstract: "روی Abstract",
-    connectWallet: "اتصال کیف پول",
+    connectWallet: "ورود با کیف پول Abstract",
     disconnect: "قطع اتصال",
     connected: "متصل",
-    wrongNetwork: "شبکه اشتباه",
-    switchHint: "تغییر به Abstract",
-    connecting: "در حال اتصال…",
-    noWallet: "کیف پولی پیدا نشد — MetaMask یا کیف پول Abstract را نصب کنید",
+    connecting: "در حال ورود…",
+    loginHint: "بدون نصب افزونه — با ایمیل، QR یا اکانت اجتماعی",
+    loginError: "ورود ناموفق بود؛ دوباره تلاش کنید",
     balance: "موجودی",
     engine: "موتور",
     data: "داده",
@@ -390,6 +388,7 @@ const fa: Dict = {
     p3t: "موتور تحلیل شفاف",
     p3b: "فرمول‌ها و وزن‌ها عمومی و قطعی‌اند؛ هش SHA-256 دادهٔ ورودی کنار هر تحلیل نمایش داده می‌شود تا هرکس بتواند خروجی را بازتولید و راستی‌آزمایی کند.",
     bullets: [
+      "ورود با Abstract Global Wallet — کیف پول هوشمند با Account Abstraction بومی، بدون نیاز به نصب هیچ افزونه‌ای",
       "CSP سخت‌گیرانه در Cloudflare (_headers) — بدون اسکریپت خارجی",
       "آدرس‌ها همیشه Checksum می‌شوند (EIP-55) و با getAddress مقایسه می‌شوند",
       "حداقل مبلغ پرداخت برای دفع تراکنش‌های اسپم روی زنجیره چک می‌شود",
@@ -435,13 +434,12 @@ const en: Dict = {
     refresh: "Refresh",
     block: "Block",
     onAbstract: "on Abstract",
-    connectWallet: "Connect wallet",
+    connectWallet: "Sign in with Abstract",
     disconnect: "Disconnect",
     connected: "Connected",
-    wrongNetwork: "Wrong network",
-    switchHint: "Switch to Abstract",
-    connecting: "Connecting…",
-    noWallet: "No wallet found — install MetaMask or the Abstract wallet",
+    connecting: "Signing in…",
+    loginHint: "No extension needed — email, QR code, or social login",
+    loginError: "Sign-in failed; please try again",
     balance: "Balance",
     engine: "Engine",
     data: "Data",
@@ -611,6 +609,7 @@ const en: Dict = {
     p3t: "Transparent engine",
     p3b: "Formulas and weights are public and deterministic; a SHA-256 hash of the input data ships with every analysis so anyone can reproduce and audit the output.",
     bullets: [
+      "Sign-in via Abstract Global Wallet — a smart wallet with native Account Abstraction, no browser extension to install",
       "Strict CSP served by Cloudflare (_headers) — no third-party scripts",
       "Addresses are always EIP-55 checksummed and compared via getAddress",
       "Minimum payment enforced on-chain to reject spam transactions",
