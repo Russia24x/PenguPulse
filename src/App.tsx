@@ -8,8 +8,8 @@ import { I18nProvider, useI18n } from "./i18n";
 import { analyze } from "./lib/ta";
 import { fetchMarket, type MarketBundle } from "./lib/market";
 import { bestAccess, fetchBlockNumber, readAutoRenew, type AccessGrant } from "./lib/chain";
-import { Mascot, PenguLogo, IcBolt, IcCandles, IcCompass, IcGlobe, IcPulse, IcRefresh, IcSnow } from "./components/icons";
-import { PriceChart, Reveal, SignalGauge, SnowCanvas, TickerTape, type TickerItem } from "./components/display";
+import { PenguLogo, IcBolt, IcCandles, IcCompass, IcGlobe, IcPulse, IcRefresh, IcSnow } from "./components/icons";
+import { PriceChart, Reveal, SignalGauge, TickerTape, type TickerItem } from "./components/display";
 import { Footer, IndicatorPanel, MethodPanel, RiskPanel, SecurityPanel } from "./components/panels";
 import { AccessCard, AgwGate, PayModal, PlansPanel, VerifyPanel, WalletButton, useWallet, type WalletApi } from "./components/wallet";
 import { AbstractWalletProvider } from "@abstract-foundation/agw-react";
@@ -193,21 +193,10 @@ function AppInner() {
       : analysis.score <= -22
         ? t.gauge.actionSell
         : t.gauge.actionWait;
-  const mood: "happy" | "sad" | "cool" | "wait" = !analysis
-    ? "wait"
-    : analysis.verdict === "strongBuy"
-      ? "cool"
-      : analysis.verdict === "buy"
-        ? "happy"
-        : analysis.verdict === "neutral"
-          ? "wait"
-          : "sad";
-
   const chartCandles = market.bundle ? (tf === "4H" ? market.bundle.candles4h : market.bundle.candles1d) : [];
 
   return (
     <div className="relative min-h-screen overflow-x-clip">
-      <SnowCanvas />
       <div className="bg-grid-ice pointer-events-none fixed inset-0" aria-hidden />
       <div className="pointer-events-none fixed -top-32 start-1/4 h-96 w-96 rounded-full bg-ice/8 blur-[110px]" aria-hidden />
       <div className="pointer-events-none fixed bottom-0 end-0 h-80 w-80 rounded-full bg-beak/7 blur-[110px]" aria-hidden />
@@ -450,15 +439,9 @@ function AppInner() {
                       )}
                     </div>
                     <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <Mascot mood={mood} size={52} />
-                        <div>
-                          <p className="font-mono text-[11px] tracking-wider text-faint">{t.status.engine} v{APP.engineVersion} · {t.status.data} #{market.bundle?.dataHash ?? "…"}</p>
-                          <p className="font-mono text-[11px] text-faint" dir="ltr">
-                            4H×{chartCandles.length} + 1D×{market.bundle?.candles1d.length ?? 0} candles · CoinGecko → Abstract
-                          </p>
-                        </div>
-                      </div>
+                      <p className="font-mono text-[11px] tracking-wider text-faint" dir="ltr">
+                        4H×{chartCandles.length} + 1D×{market.bundle?.candles1d.length ?? 0} candles · CoinGecko → Abstract
+                      </p>
                       <div className="flex items-center gap-2 font-mono text-[11.5px] text-fog">
                         <IcSnow size={14} className="text-ice" /> {t.status.onAbstract}
                         {blockNum !== null && <span className="text-ice tabular" dir="ltr">#{blockNum.toLocaleString("en-US")}</span>}
