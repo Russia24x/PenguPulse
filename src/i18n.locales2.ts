@@ -21,7 +21,7 @@ export const ko: Dict = {
     kicker: "하이브리드 기술적 분석 • Abstract 블록체인",
     title1: "펭구 시그널", title2: "터미널",
     lead: "8개의 고전 지표, 두 개의 타임프레임, 하나의 투명한 수학 점수 — 실제 시장 데이터에서 $PENGU 매수/매도 시그널; 온체인 검증된 PENGU 결제로 잠금 해제.",
-    ctaSignal: "오늘의 시그널 — 5 PENGU", ctaFull: "주간 액세스 — 30 PENGU", scroll: "터미널 입장",
+    ctaSignal: "오늘의 시그널 — 20 PENGU", ctaFull: "입장 — 10 PENGU", scroll: "터미널 입장",
   },
   gauge: {
     composite: "엔진 종합 점수", confidence: "신뢰도", agreement: "지표 가중 일치도",
@@ -47,7 +47,7 @@ export const ko: Dict = {
   plans: {
     title: "요금 — Abstract에서 PENGU로 결제",
     body: "모든 결제는 프로젝트 공개 금고로의 ERC-20 전송입니다. 영수증은 도착 즉시 온체인 검증되어 만료 시까지 액세스를 잠금 해제합니다.",
-    signup: "가입", signupDesc: "1회 결제 — 영구 마켓 터미널",
+    signup: "가입", signupDesc: "시그널 없는 마켓 터미널 — 24시간",
     signal: "오늘의 시그널", signalDesc: "일간 시그널 24시간 액세스",
     week: "주간 플랜", weekDesc: "7일 전체 액세스 + 갱신 알림",
     month: "월간 플랜", monthDesc: "30일 전체 액세스 + 알림",
@@ -60,6 +60,8 @@ export const ko: Dict = {
     featureFull: ["2개 타임프레임의 8개 지표 전체", "지지/저항 + ATR", "권장 스탑", "데이터 해시와 엔진 버전", "원클릭 갱신"],
     autoRenew: "자동 갱신",
     autoRenewHint: "활성화하면 액세스 만료 시 여기서 원클릭으로 갱신이 시작됩니다(자동 인출은 절대 없습니다).",
+    discount: (n) => `${n}% 할인`,
+    baseRate: "기본 요율: 하루 10 PENGU — 전체 시그널은 기본의 2배, 최대 30% 단계 할인",
   },
   pay: {
     title: "Abstract에서 결제", amount: "금액", recipient: "수신처(금고)", network: "네트워크", duration: "유효 기간", steps: "단계",
@@ -127,7 +129,7 @@ export const ko: Dict = {
     why1: "확장 프로그램 불필요 — 브라우저 속 스마트 지갑", why2: "가스 무료 — Abstract 네트워크 페이마스터가 지원",
     why3: "결제는 공개 금고로 직접 — Abscan에서 추적 가능",
     gasFree: "가스비: 0 — Abstract 네트워크 페이마스터가 지원", smartWallet: "AGW 스마트 지갑", foundation: "보안 기반 레이어",
-    dailySignal: "오늘의 시그널", dailyBody: "5 PENGU로 일간 시그널 24시간 액세스 — 엔진을 시험하는 가장 가벼운 방법.",
+    dailySignal: "오늘의 시그널", dailyBody: "20 PENGU로 일간 시그널 24시간 액세스 — 엔진을 시험하는 가장 가벼운 방법.",
     dailyReset: "매일 초기화 (UTC)", unlock: "{n} PENGU로 잠금 해제", otherPlans: "기타 플랜과 구독",
   },
   feed: { title: "라이브 재무 스트림", empty: "스캔 구간에 결제 없음", note: "재무 주소로 전송된 공개 Transfer 로그 — 온체인 데이터, 60초마다 새로고침" },
@@ -152,7 +154,7 @@ export const de: Dict = {
     kicker: "Hybride technische Analyse • Abstract-Blockchain",
     title1: "Das Pengu-", title2: "Signal-Terminal",
     lead: "Acht klassische Indikatoren, zwei Zeitebenen, ein transparenter Mathe-Score — ein Kauf/Verkauf-Signal für $PENGU aus echten Marktdaten; freigeschaltet durch on-chain verifizierte PENGU-Zahlungen.",
-    ctaSignal: "Heutiges Signal — 5 PENGU", ctaFull: "Wochenzugang — 30 PENGU", scroll: "Terminal betreten",
+    ctaSignal: "Heutiges Signal — 20 PENGU", ctaFull: "Einstieg — 10 PENGU", scroll: "Terminal betreten",
   },
   gauge: {
     composite: "Engine-Gesamtscore", confidence: "Konfidenz", agreement: "Gewichtete Indikator-Übereinstimmung",
@@ -178,7 +180,7 @@ export const de: Dict = {
   plans: {
     title: "Preise — in PENGU zahlen, auf Abstract",
     body: "Jede Zahlung ist ein ERC-20-Transfer an die öffentliche Projektkasse auf Abstract; der Beleg wird im Moment des Eingangs on-chain verifiziert und schaltet den Zugang bis zum Ablauf frei.",
-    signup: "Registrierung", signupDesc: "Einmalzahlung — Marktterminal für immer",
+    signup: "Registrierung", signupDesc: "Marktterminal ohne Signale — 24 Stunden",
     signal: "Heutiges Signal", signalDesc: "24 h Zugang zum täglichen Signal",
     week: "Wochenplan", weekDesc: "7 Tage Vollzugang + Verlängerungserinnerung",
     month: "Monatsplan", monthDesc: "30 Tage Vollzugang + Erinnerung",
@@ -191,6 +193,8 @@ export const de: Dict = {
     featureFull: ["Alle 8 Indikatoren auf 2 Zeitebenen", "Unterstützung/Widerstand + ATR", "Empfohlene Stopps", "Daten-Hash & Engine-Version", "Ein-Klick-Verlängerung"],
     autoRenew: "Auto-Verlängerung",
     autoRenewHint: "Wenn aktiviert, startet die Verlängerung bei Ablauf hier mit einem Klick (niemals ein automatischer Abzug).",
+    discount: (n) => `${n} % Rabatt`,
+    baseRate: "Basistarif: 10 PENGU/Tag — volles Signal = 2× Basis, gestaffelter Rabatt bis 30 %",
   },
   pay: {
     title: "Auf Abstract zahlen", amount: "Betrag", recipient: "Empfänger (Kasse)", network: "Netzwerk", duration: "Gültigkeit", steps: "Schritte",
@@ -258,7 +262,7 @@ export const de: Dict = {
     why1: "Keine Erweiterung — ein Smart Wallet direkt im Browser", why2: "Gas-frei — gesponsert vom Abstract-Netzwerk-Paymaster",
     why3: "Zahlungen gehen direkt an die öffentliche Kasse — auf Abscan nachverfolgbar",
     gasFree: "Gas-Gebühr: 0 — gesponsert vom Abstract-Netzwerk-Paymaster", smartWallet: "AGW-Smart-Wallet", foundation: "Sicherheits-Fundamentschicht",
-    dailySignal: "Heutiges Signal", dailyBody: "5 PENGU für 24 Stunden Tagessignal — der leichteste Weg, die Engine zu testen.",
+    dailySignal: "Heutiges Signal", dailyBody: "20 PENGU für 24 Stunden Tagessignal — der leichteste Weg, die Engine zu testen.",
     dailyReset: "Täglicher Reset (UTC)", unlock: "Freischalten für {n} PENGU", otherPlans: "Weitere Pläne & Abos",
   },
   feed: { title: "Live-Treasury-Stream", empty: "Keine Zahlungen im Scan-Fenster", note: "Öffentliche Transfer-Logs an die Projektkasse — On-Chain-Daten, alle 60 s aktualisiert" },

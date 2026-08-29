@@ -500,6 +500,7 @@ function AppInner() {
           <RiskPanel analysis={analysis} tier={tier} />
           <PlansPanel wallet={wallet} access={access} onPay={onPay} notify={notify} />
           <VerifyPanel notify={notify} />
+          <TreasuryFeed />
           <SecurityPanel />
           <MethodPanel />
         </main>

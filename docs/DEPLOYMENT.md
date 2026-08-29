@@ -1,67 +1,65 @@
-# دیپلوی روی Cloudflare Pages (طرح رایگان، بدون کارت) + ثبت در Abstract Portal
+# دیپلوی روی Cloudflare Workers Static Assets (رایگان) + ثبت در Abstract Portal
 
-## ۱) Cloudflare Pages — گام‌به‌گام
+## ۱) مدل دیپلوی فعلی پروژه
 
-1. در [dash.cloudflare.com](https://dash.cloudflare.com) با ایمیل ثبت‌نام کنید (طرح Free — بدون کارت اعتباری).
-2. کد را در یک ریپازیتوری گیت‌هاب/گیت‌لب بگذارید.
-3. منوی **Workers & Pages → Create → Pages → Connect to Git** و ریپازیتوری را انتخاب کنید.
-4. تنظیمات بیلد:
+پروژه به‌صورت **Workers Static Assets** دیپلوی می‌شود (نه Pages):
 
-   | فیلد | مقدار |
-   |---|---|
-   | Framework preset | `Vite` (یا None) |
-   | Build command | `npm run build` |
-   | Build output directory | `dist` |
-   | Node version | `18+` (متغیر `NODE_VERSION=20`) |
+- فایل `wrangler.jsonc` ریشه + پلاگین `@cloudflare/vite-plugin`
+- دستور دیپلوی: `npm run deploy` (= بیلد + `wrangler deploy`)
+- روتینگ SPA با `assets.not_found_handling: "single-page-application"` — به همین دلیل فایل `_redirects` حذف شده (باعث خطای 100324 حلقهٔ بی‌نهایت می‌شد)
+- هدرهای امنیتی: `public/_headers` (CSP سازگار با مودال ورود AGW/Privy)
 
-5. **Deploy**. فایل‌های `public/_headers` و `public/_redirects` به‌صورت خودکار کپی و اعمال می‌شوند:
-   - `_headers` → CSP سخت‌گیرانه و هدرهای امنیتی (بدون نیاز به تنظیمات اضافی)
-   - `_redirects` → روتینگ SPA
+> نکتهٔ مهم: CSP شامل `frame-src` و `connect-src` برای `*.privy.io` و ریله‌های WalletConnect است؛ بدون آن‌ها مودال ورود AGW در مرورگر مسدود می‌شود.
 
-6. (اختیاری) **Custom domains** → اتصال دامنه با DNS خودکار Cloudflare.
+## ۲) گام‌به‌گام (طرح رایگان، بدون کارت اعتباری)
 
-### جایگزین CLI
+1. ثبت‌نام در [dash.cloudflare.com](https://dash.cloudflare.com) (طرح Free)
+2. اتصال ریپازیتوری به **Workers Builds** یا دیپلوی دستی با CLI:
 
 ```bash
-npm i -g wrangler
+npm i -D wrangler
 npm run build
-wrangler pages deploy dist --project-name pengu-pulse
+npx wrangler deploy        # در اولین اجرا، پروژه را به‌صورت خودکار پیکربندی می‌کند
 ```
 
-> هر دو مسیر روی طرح رایگان‌اند؛ محدودیت‌ها (پهنای باند نامحدود، ۵۰۰ دیپلوی/ماه) برای این پروژه بسیار بیشتر از نیاز است.
+3. پیکربندی خودکار wrangler برای Vite:
+   - Worker Name: `pengupulse`
+   - Build Command: `npm run build`
+   - Output: `dist`
+   - SPA fallback فعال
+4. (اختیاری) اتصال دامنهٔ اختصاصی در داشبورد Workers → Settings → Domains
 
-## ۲) ثبت پروژه در Abstract Portal
+## ۳) ثبت پروژه در Abstract Portal
 
-[portal.abs.xyz](https://portal.abs.xyz) درگاه رسمی اکوسیستم Abstract برای نمایش و کشف پروژه‌هاست.
+[portal.abs.xyz](https://portal.abs.xyz) درگاه رسمی اکوسیستم Abstract برای کشف پروژه‌هاست.
 
 ### پیش‌نیازها
-- سایت دیپلوی‌شده روی دامنهٔ عمومی (ترجیحاً HTTPS با دامنهٔ اختصاصی)
-- یک کیف پول Abstract (یا هر کیف EVM) برای امضای ثبت
-- لوگو/تصویر پروژه (مربع، ترجیحاً 512×512)
+- سایت دیپلوی‌شده با دامنهٔ عمومی HTTPS
+- کیف پول Abstract (AGW) برای امضای ثبت
+- لوگوی مربع 512×512
 
 ### مراحل
-1. ورود به [portal.abs.xyz](https://portal.abs.xyz) و اتصال کیف پول.
-2. انتخاب **Submit / Register a project** و تکمیل فرم:
-   - **نام**: `Pengu Pulse (پنگو پالس)`
-   - **دسته**: Analytics / Tools / Trading
-   - **شبکه**: Abstract Mainnet (Chain ID 2741)
-   - **URL**: آدرس دیپلوی‌شدهٔ Cloudflare Pages
-   - **توضیح کوتاه**: «ترمینال سیگنال تکنیکال PENGU با راستی‌آزمایی پرداخت روی‌زنجیره‌ای»
-   - **قرارداد‌ها**: آدرس توکن PENGU `0x9eBe3A824Ca958e4b3Da772D2065518F009CBa62` و خزانه `0x60Df4E186364c3a49A550Aee29Da1d5fe3658818`
-3. امضای پیام تأیید مالکیت با کیف پول و ارسال برای بازبینی تیم Abstract.
-4. پس از تأیید، پروژه در Portal فهرست می‌شود؛ می‌توانید نشان «Built on Abstract» را هم دریافت کنید.
+1. ورود به Portal و اتصال کیف پول
+2. تکمیل فرم ثبت پروژه:
+   - **نام**: Pengu Pulse (پنگو پالس)
+   - **دسته**: Analytics / Trading Tools
+   - **شبکه**: Abstract Mainnet — Chain ID 2741
+   - **URL**: آدرس دیپلوی‌شده
+   - **قرارداد‌ها**: توکن PENGU `0x9eBe3A824Ca958e4b3Da772D2065518F009CBa62` و خزانه `0x60Df4E186364c3a49A550Aee29Da1d5fe3658818`
+3. امضای پیام تأیید و ارسال برای بازبینی
+4. پس از تأیید، پروژه در Portal فهرست و واجد شرایط رأی‌گیری جامعه می‌شود
 
 ### نکات افزایش شانس تأیید
-- صفحهٔ Security/Methodology شفاف است (در خود اپ موجود) — لینک مستقیم بدهید
-- لینک Abscan خزانه را ضمیمه کنید تا جریان وجوه عمومی و قابل حسابرسی دیده شود
-- ریپازیتوری عمومی + README کامل (این مخزن) را ذکر کنید
+- لینک Abscan خزانه (جریان وجوه عمومی و قابل حسابرسی)
+- ریپازیتوری عمومی + README کامل
+- صفحهٔ Security/Methodology شفاف داخل خود اپ
 
-## ۳) چک‌لیست نهایی دیپلوی
+## ۴) چک‌لیست نهایی
 
-- [ ] بیلد بدون خطا: `npm run build`
-- [ ] هدرهای CSP فعال‌اند (در DevTools → Network بررسی `content-security-policy`)
-- [ ] اتصال کیف پول + افزودن خودکار شبکهٔ Abstract کار می‌کند
-- [ ] پرداخت 1 PENGU → باز شدن سیگنال امروز (رسید در Abscan)
+- [ ] `npm run build` بدون خطا
+- [ ] `npx wrangler deploy` بدون خطای `_redirects` (فایل حذف شده)
+- [ ] هدر CSP در DevTools → Network وجود دارد و مودال AGW باز می‌شود
+- [ ] پرداخت PENGU → رسید در Abscan → باز شدن دسترسی
 - [ ] پنل «راستی‌آزمایی» همان تراکنش را با هش تأیید می‌کند
-- [ ] کش آفلاین: قطع شبکه → دادهٔ `stale` نمایش داده می‌شود، نه خطای خالی
-- [ ] هر دو زبان fa/en و جهت RTL/LTR
+- [ ] جریان زندهٔ خزانه، تراکنش‌های عمومی را نشان می‌دهد
+- [ ] ۱۰ زبان و جهت RTL/LTR

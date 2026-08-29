@@ -21,7 +21,7 @@ export const fr: Dict = {
     kicker: "Analyse technique hybride • Blockchain Abstract",
     title1: "Le terminal de", title2: "signaux Pengu",
     lead: "Huit indicateurs classiques, deux unités de temps, un score mathématique transparent — un signal d'achat/vente $PENGU issu de données réelles ; débloqué par des paiements PENGU vérifiés on-chain.",
-    ctaSignal: "Signal du jour — 5 PENGU", ctaFull: "Accès hebdo — 30 PENGU", scroll: "Entrer dans le terminal",
+    ctaSignal: "Signal du jour — 20 PENGU", ctaFull: "Entrée — 10 PENGU", scroll: "Entrer dans le terminal",
   },
   gauge: {
     composite: "Score composite du moteur", confidence: "Confiance", agreement: "Accord pondéré des indicateurs",
@@ -47,7 +47,7 @@ export const fr: Dict = {
   plans: {
     title: "Tarifs — payez en PENGU, sur Abstract",
     body: "Chaque paiement est un transfert ERC-20 vers le trésor public du projet sur Abstract ; le reçu est vérifié on-chain à l'arrivée et débloque l'accès jusqu'à expiration.",
-    signup: "Inscription", signupDesc: "Paiement unique — terminal de marché pour toujours",
+    signup: "Inscription", signupDesc: "Terminal de marché sans signaux — 24 h",
     signal: "Signal du jour", signalDesc: "Accès 24 h au signal quotidien",
     week: "Plan hebdo", weekDesc: "7 jours d'accès complet + rappel de renouvellement",
     month: "Plan mensuel", monthDesc: "30 jours d'accès complet + rappel",
@@ -60,6 +60,8 @@ export const fr: Dict = {
     featureFull: ["Les 8 indicateurs sur 2 unités de temps", "Support/résistance + ATR", "Stops suggérés", "Hash des données et version du moteur", "Renouvellement en un clic"],
     autoRenew: "Renouvellement auto",
     autoRenewHint: "Si activé, le renouvellement démarre ici en un clic à l'expiration (jamais de prélèvement automatique).",
+    discount: (n) => `-${n} %`,
+    baseRate: "Tarif de base : 10 PENGU/jour — signal complet = 2× la base, remise progressive jusqu'à 30 %",
   },
   pay: {
     title: "Payer sur Abstract", amount: "Montant", recipient: "Destinataire (trésor)", network: "Réseau", duration: "Validité", steps: "Étapes",
@@ -127,7 +129,7 @@ export const fr: Dict = {
     why1: "Sans extension — un portefeuille intelligent dans votre navigateur", why2: "Sans gaz — sponsorisé par le paymaster du réseau Abstract",
     why3: "Les paiements vont directement au trésor public — traçables sur Abscan",
     gasFree: "Frais de gaz : 0 — sponsorisés par le paymaster du réseau Abstract", smartWallet: "Portefeuille intelligent AGW", foundation: "Couche de sécurité fondatrice",
-    dailySignal: "Signal du jour", dailyBody: "5 PENGU pour 24 h de signal quotidien — la façon la plus légère d'essayer le moteur.",
+    dailySignal: "Signal du jour", dailyBody: "20 PENGU pour 24 h de signal quotidien — la façon la plus légère d'essayer le moteur.",
     dailyReset: "Réinitialisation quotidienne (UTC)", unlock: "Débloquer pour {n} PENGU", otherPlans: "Autres plans et abonnements",
   },
   feed: { title: "Flux trésorerie en direct", empty: "Aucun paiement dans la fenêtre scannée", note: "Journaux Transfer publics vers la trésorerie — données on-chain, rafraîchies toutes les 60 s" },
@@ -152,7 +154,7 @@ export const ru: Dict = {
     kicker: "Гибридный теханализ • Блокчейн Abstract",
     title1: "Терминал сигналов", title2: "Pengu",
     lead: "Восемь классических индикаторов, два таймфрейма, один прозрачный математический счёт — сигнал покупки/продажи $PENGU из реальных рыночных данных; открывается платежами PENGU с ончейн-верификацией.",
-    ctaSignal: "Сигнал на сегодня — 5 PENGU", ctaFull: "Недельный доступ — 30 PENGU", scroll: "Войти в терминал",
+    ctaSignal: "Сигнал на сегодня — 20 PENGU", ctaFull: "Вход — 10 PENGU", scroll: "Войти в терминал",
   },
   gauge: {
     composite: "Сводный счёт движка", confidence: "Уверенность", agreement: "Взвешенное согласие индикаторов",
@@ -178,7 +180,7 @@ export const ru: Dict = {
   plans: {
     title: "Тарифы — оплата в PENGU на Abstract",
     body: "Каждый платёж — это ERC-20-перевод в публичную казну проекта на Abstract; квитанция верифицируется ончейн в момент подтверждения и открывает доступ до истечения срока.",
-    signup: "Регистрация", signupDesc: "Единоразовый платёж — рыночный терминал навсегда",
+    signup: "Регистрация", signupDesc: "Рыночный терминал без сигналов — 24 часа",
     signal: "Сигнал на сегодня", signalDesc: "24 часа доступа к дневному сигналу",
     week: "Недельный план", weekDesc: "7 дней полного доступа + напоминание",
     month: "Месячный план", monthDesc: "30 дней полного доступа + напоминание",
@@ -191,6 +193,8 @@ export const ru: Dict = {
     featureFull: ["Все 8 индикаторов на 2 таймфреймах", "Поддержка/сопротивление + ATR", "Рекомендуемые стопы", "Хэш данных и версия движка", "Продление в один клик"],
     autoRenew: "Автопродление",
     autoRenewHint: "Если включено, продление начинается здесь одним кликом при истечении доступа (никаких автосписаний).",
+    discount: (n) => `скидка ${n} %`,
+    baseRate: "Базовый тариф: 10 PENGU/день — полный сигнал = 2× базы, ступенчатая скидка до 30 %",
   },
   pay: {
     title: "Оплата на Abstract", amount: "Сумма", recipient: "Получатель (казна)", network: "Сеть", duration: "Срок", steps: "Шаги",
@@ -258,7 +262,7 @@ export const ru: Dict = {
     why1: "Без расширения — умный кошелёк прямо в браузере", why2: "Без газа — спонсирует пеймастер сети Abstract",
     why3: "Платежи идут прямо в публичную казну — отслеживаются в Abscan",
     gasFree: "Газ: 0 — спонсируется пеймастером сети Abstract", smartWallet: "Умный кошелёк AGW", foundation: "Фундаментальный слой безопасности",
-    dailySignal: "Сигнал на сегодня", dailyBody: "5 PENGU за 24 часа дневного сигнала — самый лёгкий способ попробовать движок.",
+    dailySignal: "Сигнал на сегодня", dailyBody: "20 PENGU за 24 часа дневного сигнала — самый лёгкий способ попробовать движок.",
     dailyReset: "Ежедневный сброс (UTC)", unlock: "Открыть за {n} PENGU", otherPlans: "Другие тарифы и подписки",
   },
   feed: { title: "Живой поток казны", empty: "Нет платежей в окне сканирования", note: "Публичные логи Transfer в казну проекта — он-чейн данные, обновление каждые 60 с" },
