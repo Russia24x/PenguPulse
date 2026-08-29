@@ -14,7 +14,7 @@ export const es: Dict = {
   status: {
     live: "EN VIVO", refresh: "Actualizar", block: "Bloque", onAbstract: "en Abstract",
     connectWallet: "Entrar con Abstract", disconnect: "Desconectar", connected: "Conectado", connecting: "Iniciando sesión…",
-    loginHint: "Sin extensión — correo, código QR o cuenta social", loginError: "No se pudo iniciar sesión; inténtalo de nuevo",
+    loginHint: "Sin extensión — correo, código QR o cuenta social", loginError: "No se pudo iniciar sesión; inténtalo de nuevo", openNewTab: "Abrir en una ventana nueva",
     balance: "Saldo", engine: "Motor", data: "Datos", offline: "Caché sin conexión",
     loadingMarket: "Obteniendo datos de mercado en vivo…", marketError: "Falló la obtención de datos", retry: "Reintentar", langToggle: "Idioma",
   },
@@ -147,7 +147,7 @@ export const hi: Dict = {
   status: {
     live: "लाइव", refresh: "रिफ्रेश", block: "ब्लॉक", onAbstract: "Abstract पर",
     connectWallet: "Abstract से लॉगिन", disconnect: "डिस्कनेक्ट", connected: "जुड़ा हुआ", connecting: "लॉगिन हो रहा है…",
-    loginHint: "कोई एक्सटेंशन नहीं — ईमेल, QR कोड या सोशल अकाउंट", loginError: "लॉगिन विफल; पुनः प्रयास करें",
+    loginHint: "कोई एक्सटेंशन नहीं — ईमेल, QR कोड या सोशल अकाउंट", loginError: "लॉगिन विफल; पुनः प्रयास करें", openNewTab: "नई विंडो में खोलें",
     balance: "शेष", engine: "इंजन", data: "डेटा", offline: "ऑफ़लाइन कैश",
     loadingMarket: "लाइव बाज़ार डेटा लाया जा रहा है…", marketError: "बाज़ार डेटा विफल", retry: "पुनः प्रयास", langToggle: "भाषा",
   },
@@ -280,7 +280,7 @@ export const zh: Dict = {
   status: {
     live: "实时", refresh: "刷新", block: "区块", onAbstract: "在 Abstract 上",
     connectWallet: "使用 Abstract 登录", disconnect: "断开连接", connected: "已连接", connecting: "登录中…",
-    loginHint: "无需插件 — 邮箱、二维码或社交账户", loginError: "登录失败，请重试",
+    loginHint: "无需插件 — 邮箱、二维码或社交账户", loginError: "登录失败，请重试", openNewTab: "在新窗口中打开",
     balance: "余额", engine: "引擎", data: "数据", offline: "离线缓存",
     loadingMarket: "正在获取实时行情数据…", marketError: "行情数据获取失败", retry: "重试", langToggle: "语言",
   },
@@ -413,7 +413,7 @@ export const ja: Dict = {
   status: {
     live: "ライブ", refresh: "更新", block: "ブロック", onAbstract: "Abstract 上",
     connectWallet: "Abstract でログイン", disconnect: "切断", connected: "接続済み", connecting: "ログイン中…",
-    loginHint: "拡張機能不要 — メール、QRコード、ソーシャルアカウント", loginError: "ログインに失敗しました。再試行してください",
+    loginHint: "拡張機能不要 — メール、QRコード、ソーシャルアカウント", loginError: "ログインに失敗しました。再試行してください", openNewTab: "新しいウィンドウで開く",
     balance: "残高", engine: "エンジン", data: "データ", offline: "オフラインキャッシュ",
     loadingMarket: "リアルタイム市場データを取得中…", marketError: "市場データの取得に失敗", retry: "再試行", langToggle: "言語",
   },
