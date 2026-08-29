@@ -8,7 +8,7 @@
  * توسط Paymaster شبکهٔ Abstract اسپانسر می‌شود.
  */
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import { ABSTRACT, PENGU, PLANS, TREASURY, fmt, planById, type Plan, type PlanId } from "../config";
+import { ABSTRACT, ECOSYSTEM, PENGU, PLANS, TREASURY, fmt, planById, type Plan, type PlanId } from "../config";
 import { useI18n } from "../i18n";
 import {
   ChainError,
@@ -16,8 +16,10 @@ import {
   explorerAddr,
   explorerTx,
   fetchPenguBalance,
+  fetchPortalProfile,
   fetchTreasuryFeed,
   readAutoRenew,
+  type PortalProfile,
   saveGrantFor,
   sendPaymentViaAgw,
   type TreasuryInflow,
