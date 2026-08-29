@@ -433,7 +433,7 @@ export function PlansPanel({
             <h3 className="font-display text-[26px] text-snow">{t.terminal.dailySignal}</h3>
             <p className="mt-1 text-[13px] leading-6 text-fog">{t.terminal.dailyBody}</p>
             <p className="mt-5 font-mono text-[56px] font-bold leading-none text-beak tabular">
-              1<span className="ms-2 text-[18px] font-semibold text-snow/80">{PENGU.symbol}</span>
+              {featured.price}<span className="ms-2 text-[18px] font-semibold text-snow/80">{PENGU.symbol}</span>
             </p>
             <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-line bg-abyss/60 px-4 py-3">
               <p className="flex items-center gap-2 text-[12.5px] text-fog">

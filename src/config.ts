@@ -82,7 +82,7 @@ export const PLANS: Plan[] = [
   { id: "week", price: "125", hours: 24 * 7, tier: 2, discount: 11, subscription: true },
   { id: "month", price: "480", hours: 24 * 30, tier: 2, discount: 20, subscription: true },
   { id: "year", price: "5110", hours: 24 * 365, tier: 2, discount: 30, subscription: true },
-  { id: "lifetime", price: "12000", hours: 0, tier: 2, subscription: true },
+  { id: "lifetime", price: "12000", hours: 0, tier: 2 },
 ];
 
 /** آیا تعرفه اعتبار دائمی دارد؟ */
