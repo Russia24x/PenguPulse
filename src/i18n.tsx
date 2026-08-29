@@ -130,6 +130,10 @@ export interface Dict {
     autoRenewHint: string;
     discount: (n: number) => string;
     baseRate: string;
+    needSignup: string;
+    lifetime: string;
+    lifetimeDesc: string;
+    required: string;
   };
   pay: {
     title: string;
@@ -356,7 +360,11 @@ const fa: Dict = {
     autoRenew: "تمدید خودکار",
     autoRenewHint: "با فعال‌کردن، هنگام انقضای دسترسی پرداخت با یک کلیک از همین‌جا آغاز می‌شود (بدون هیچ برداشت خودکار از کیف پول).",
     discount: (n: number) => `${n}٪ تخفیف`,
-    baseRate: "نرخ پایه: روزانه ۱۰ PENGU — سیگنال کامل ۲× نرخ پایه، با تخفیف پلکانی تا سقف ۳۰٪",
+    baseRate: "سیگنال روزانه ۲۰ PENGU (نرخ پایه) — تعرفه‌های بلندمدت با تخفیف پلکانی تا ۳۰٪ و لایف‌تایم دائمی",
+    needSignup: "برای خرید سیگنال، ابتدا ثبت‌نام (۱۰ PENGU) لازم است",
+    lifetime: "لایف‌تایم",
+    lifetimeDesc: "دسترسی دائمی و مادام‌العمر به سیگنال کامل — یک بار برای همیشه",
+    required: "الزامی",
   },
   pay: {
     title: "پرداخت روی Abstract",
@@ -608,7 +616,11 @@ const en: Dict = {
     autoRenew: "Auto-renew",
     autoRenewHint: "When enabled, renewal starts from here with one click as access expires (never an automatic withdrawal).",
     discount: (n: number) => `${n}% off`,
-    baseRate: "Base rate: 10 PENGU/day — full signal at 2x base, with step discounts up to 30%",
+    baseRate: "Daily signal at 20 PENGU (base rate) — longer plans with step discounts up to 30% and a permanent lifetime plan",
+    needSignup: "Sign-up (10 PENGU) is required before buying any signal",
+    lifetime: "Lifetime",
+    lifetimeDesc: "Permanent, forever access to the full signal — pay once",
+    required: "Required",
   },
   pay: {
     title: "Pay on Abstract",
