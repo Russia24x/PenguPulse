@@ -8,7 +8,7 @@
 | توکن پرداخت | PENGU (OFT) روی Abstract — `0x9eBe3A824Ca958e4b3Da772D2065518F009CBa62` |
 | خزانهٔ پروژه | `0x60Df4E186364c3a49A550Aee29Da1d5fe3658818` ([Abscan](https://abscan.org/address/0x60Df4E186364c3a49A550Aee29Da1d5fe3658818)) |
 | دادهٔ بازار | CoinGecko Public API (رایگان، بدون کلید) |
-| میزبانی | Cloudflare Pages — طرح رایگان، بدون کارت اعتباری |
+| میزبانی | Cloudflare Workers Static Assets — طرح رایگان، بدون کارت اعتباری (`wrangler deploy`) |
 
 ---
 
@@ -76,7 +76,7 @@ src/
 
 ## امنیت
 
-- هیچ بک‌اندی نیست؛ CSP سخت‌گیرانه در `public/_headers` (سروی Cloudflare Pages)
+- هیچ بک‌اندی نیست؛ CSP سازگار با AGW در `public/_headers` (سروی Workers Static Assets)
 - امضا فقط داخل کیف پول هوشمند AGW؛ هیچ کلید خصوصی در مرورگر یا سرور ذخیره نمی‌شود
 - همهٔ آدرس‌ها EIP-55 checksum و با `getAddress` مقایسه می‌شوند
 - حداقل مبلغ پرداخت روی زنجیره اعتبارسنجی می‌شود؛ رسید ناموفق/توکن اشتباه/گیرندهٔ اشتباه رد می‌شود
@@ -85,7 +85,7 @@ src/
 ## مستندات تکمیلی
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — جریان داده، ریاضیات موتور، مدل اعتماد، نقشهٔ راه قرارداد اشتراک
-- [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — دیپلوی روی Cloudflare Pages (رایگان) + ثبت پروژه در [Abstract Portal](https://portal.abs.xyz)
+- [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — دیپلوی روی Cloudflare Workers Static Assets (رایگان) + ثبت پروژه در [Abstract Portal](https://portal.abs.xyz)
 
 ---
 
