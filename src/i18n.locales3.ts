@@ -13,7 +13,7 @@ export const fr: Dict = {
   status: {
     live: "EN DIRECT", refresh: "Actualiser", block: "Bloc", onAbstract: "sur Abstract",
     connectWallet: "Se connecter avec Abstract", disconnect: "Déconnecter", connected: "Connecté", connecting: "Connexion…",
-    loginHint: "Sans extension — e-mail, code QR ou compte social", loginError: "Échec de la connexion ; réessayez",
+    loginHint: "Sans extension — e-mail, code QR ou compte social", loginError: "Échec de la connexion ; réessayez", openNewTab: "Ouvrir dans une nouvelle fenêtre",
     balance: "Solde", engine: "Moteur", data: "Données", offline: "Cache hors ligne",
     loadingMarket: "Récupération des données de marché…", marketError: "Échec des données de marché", retry: "Réessayer", langToggle: "Langue",
   },
@@ -146,7 +146,7 @@ export const ru: Dict = {
   status: {
     live: "LIVE", refresh: "Обновить", block: "Блок", onAbstract: "на Abstract",
     connectWallet: "Войти через Abstract", disconnect: "Отключить", connected: "Подключено", connecting: "Вход…",
-    loginHint: "Без расширения — e-mail, QR-код или соцсеть", loginError: "Не удалось войти; попробуйте снова",
+    loginHint: "Без расширения — e-mail, QR-код или соцсеть", loginError: "Не удалось войти; попробуйте снова", openNewTab: "Открыть в новом окне",
     balance: "Баланс", engine: "Движок", data: "Данные", offline: "Офлайн-кэш",
     loadingMarket: "Получаем рыночные данные…", marketError: "Ошибка данных рынка", retry: "Повторить", langToggle: "Язык",
   },

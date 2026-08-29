@@ -1,9 +1,12 @@
-# Cloudflare Workers Static Assets — هدرهای امنیتی (طرح رایگان)
+# Cloudflare Workers Static Assets — هدرهای امنیتی (سازگار با AGW/Privy)
+# نکته: COOP روی same-origin-allow-popups تنظیم شده تا پنجرهٔ ورود AGW
+# (که برای OAuth و تایید تراکنش از popup استفاده می‌کند) بتواند با صفحه ارتباط برقرار کند.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://auth.privy.io https://*.privy.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.privy.io; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://api.coingecko.com https://api.mainnet.abs.xyz https://api.abs.xyz wss://api.mainnet.abs.xyz https://*.privy.io https://auth.privy.io https://portal.abs.xyz https://*.abs.xyz wss://relay.walletconnect.com wss://*.walletconnect.com; frame-src 'self' https://auth.privy.io https://*.privy.io; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://auth.privy.io https://*.privy.io https://*.walletconnect.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.privy.io; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: blob: data:; connect-src 'self' https://api.coingecko.com https://api.mainnet.abs.xyz https://api.abs.xyz wss://api.mainnet.abs.xyz https://auth.privy.io https://*.privy.io wss://*.privy.io https://portal.abs.xyz https://*.abs.xyz wss://relay.walletconnect.com wss://*.walletconnect.com https://*.walletconnect.com https://verify.walletconnect.com https://rpc.walletconnect.com https://*.walletconnect.org; frame-src 'self' https://auth.privy.io https://*.privy.io https://*.walletconnect.com https://verify.walletconnect.com; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
-  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Cross-Origin-Resource-Policy: cross-origin
   Strict-Transport-Security: max-age=63072000; includeSubDomains
