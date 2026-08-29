@@ -11,7 +11,7 @@ import { bestAccess, discoverOnChainAccess, fetchBlockNumber, readAutoRenew, sav
 import { PenguLogo, IcBolt, IcCandles, IcCompass, IcGlobe, IcPulse, IcRefresh, IcSnow } from "./components/icons";
 import { PriceChart, Reveal, SignalGauge, TickerTape, type TickerItem } from "./components/display";
 import { Footer, IndicatorPanel, MethodPanel, RiskPanel, SecurityPanel } from "./components/panels";
-import { AccessCard, AgwGate, PayModal, PlansPanel, TreasuryFeed, VerifyPanel, WalletButton, useWallet, type WalletApi } from "./components/wallet";
+import { AccessCard, AgwGate, PayModal, PlansPanel, VerifyPanel, WalletButton, useWallet, type WalletApi } from "./components/wallet";
 import { AbstractWalletProvider } from "@abstract-foundation/agw-react";
 import { abstractChain } from "./lib/chain";
 
@@ -500,7 +500,6 @@ function AppInner() {
           <RiskPanel analysis={analysis} tier={tier} />
           <PlansPanel wallet={wallet} access={access} onPay={onPay} notify={notify} />
           <VerifyPanel notify={notify} />
-          <TreasuryFeed />
           <SecurityPanel />
           <MethodPanel />
         </main>
