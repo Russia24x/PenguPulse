@@ -613,6 +613,7 @@ export function VerifyPanel({ notify }: { notify: (m: string) => void }) {
           </div>
         )}
       </div>
+      <TreasuryFeed />
     </Section>
   );
 }
