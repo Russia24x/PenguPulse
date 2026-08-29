@@ -116,8 +116,9 @@ export class ChainError extends Error {
 
 const MIN_WEI = parseUnits(MIN_PAYMENT, PENGU.decimals);
 
-/** انقضا = زمان پرداخت + مدت تعرفه (همهٔ تعرفه‌ها زمان‌دارند؛ تعرفهٔ دائمی حذف شده است) */
+/** انقضا = زمان پرداخت + مدت تعرفه؛ hours=0 یعنی دائمی (۱۰۰ سال) */
 function expiresFor(plan: Plan, grantedAtSec: number): number {
+  if (plan.hours === 0) return grantedAtSec + 100 * 365 * 24 * 3600;
   return grantedAtSec + plan.hours * 3600;
 }
 
@@ -444,6 +445,33 @@ export function bestAccess(address: Address | null, nowSec: number): AccessGrant
   const grants = (map[address.toLowerCase()] ?? []).filter((g) => g.expiresAt > nowSec);
   if (!grants.length) return null;
   return grants.sort((a, b) => b.tier - a.tier || b.expiresAt - a.expiresAt)[0];
+}
+
+/* --------------------------- مدل دسترسی دولایه --------------------------
+ * لایهٔ ۱: ثبت‌نام (پیش‌پرداخت الزامی) — بدون آن هیچ خدماتی فعال نیست
+ * لایهٔ ۲: سیگنال (روزانه/هفتگی/ماهانه/سالانه/لایف‌تایم)
+ */
+export interface AccessState {
+  signup: AccessGrant | null;
+  signal: AccessGrant | null;
+  tier: 0 | 1 | 2;
+  /** سیگنال معتبر وجود دارد ولی ثبت‌نام ندارد */
+  needsSignup: boolean;
+}
+
+export function accessState(address: Address | null, nowSec: number): AccessState {
+  const map = address ? readMap() : {};
+  const grants = ((address && map[address.toLowerCase()]) || []).filter((g) => g.expiresAt > nowSec);
+  const pick = (test: (g: AccessGrant) => boolean) =>
+    grants.filter(test).sort((a, b) => b.expiresAt - a.expiresAt)[0] ?? null;
+  const signup = pick((g) => g.tier === 1);
+  const signal = pick((g) => g.tier === 2);
+  return {
+    signup,
+    signal,
+    tier: signup && signal ? 2 : signup ? 1 : 0,
+    needsSignup: !signup && !!signal,
+  };
 }
 
 /* ----------------------------- تمدید خودکار --------------------------- */

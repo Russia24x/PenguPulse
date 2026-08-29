@@ -7,7 +7,7 @@ import { ABSTRACT, APP, LANG_META, PENGU, fmt, planById, type Plan } from "./con
 import { I18nProvider, useI18n } from "./i18n";
 import { analyze } from "./lib/ta";
 import { fetchMarket, type MarketBundle } from "./lib/market";
-import { bestAccess, discoverOnChainAccess, fetchBlockNumber, readAutoRenew, saveGrantFor, type AccessGrant, type ScanState } from "./lib/chain";
+import { accessState, bestAccess, discoverOnChainAccess, fetchBlockNumber, readAutoRenew, saveGrantFor, type AccessGrant, type ScanState } from "./lib/chain";
 import { PenguLogo, IcBolt, IcCandles, IcCompass, IcGlobe, IcPulse, IcRefresh, IcSnow } from "./components/icons";
 import { PriceChart, Reveal, SignalGauge, TickerTape, type TickerItem } from "./components/display";
 import { Footer, IndicatorPanel, MethodPanel, RiskPanel, SecurityPanel } from "./components/panels";
@@ -160,12 +160,13 @@ function AppInner() {
     [market.bundle],
   );
 
-  const access: AccessGrant | null = useMemo(
-    () => bestAccess(wallet.address, Math.floor(Date.now() / 1000)),
+  const acc = useMemo(
+    () => accessState(wallet.address, Math.floor(Date.now() / 1000)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [wallet.address, accessTick, market.bundle],
   );
-  const tier: 0 | 1 | 2 = access?.tier ?? 0;
+  const access: AccessGrant | null = acc.signal ?? acc.signup;
+  const tier: 0 | 1 | 2 = acc.tier;
 
   /* ------------------------- فلش قیمت ---------------------------- */
   useEffect(() => {
@@ -189,6 +190,12 @@ function AppInner() {
     if (wallet.status !== "connected") {
       notify(t.status.connectWallet);
       wallet.connect();
+      return;
+    }
+    // پیش‌پرداخت ثبت‌نام الزامی است؛ بدون آن خرید سیگنال ممکن نیست
+    if (plan.tier === 2 && !acc.signup) {
+      notify(t.plans.needSignup);
+      setPayPlan(planById("signup"));
       return;
     }
     setPayPlan(plan);

@@ -47,7 +47,7 @@ export const TREASURY = "0x60Df4E186364c3a49A550Aee29Da1d5fe3658818";
 /* ------------------------------------------------------------------ */
 /* تعرفه‌ها — قیمت‌ها به واحد PENGU؛ همهٔ پرداخت‌ها انتقال مستقیم ERC-20   */
 /* ------------------------------------------------------------------ */
-export type PlanId = "signup" | "signal" | "week" | "month" | "year";
+export type PlanId = "signup" | "signal" | "week" | "month" | "year" | "lifetime";
 
 export interface Plan {
   id: PlanId;
@@ -65,19 +65,28 @@ export interface Plan {
 }
 
 /**
- * نرخ پایه: روزانه ۱۰ PENGU برای ورود (بدون سیگنال)؛ سیگنال کامل ۲× نرخ پایه.
- * تخفیف پلکانی: ۰٪ / ۱۰٪ / ۲۰٪ / ۳۰٪ — سقف تخفیف ۳۰٪.
- * همهٔ اعداد صحیح‌اند: 70×0.9=63 · 140×0.9=126 · 300×0.8=240 · 600×0.8=480 · 3650×0.7=2555 · 7300×0.7=5110
+ * تعرفه‌ها (همه به PENGU؛ پرداخت = انتقال مستقیم ERC-20 به خزانه، بدون Session Key):
+ *   ثبت‌نام   10    — پیش‌پرداختِ الزامی، دسترسی دائمی به ترمینال بازار (بدون سیگنال)
+ *   روزانه    20    — سیگنال کامل، ۲۴ ساعت
+ *   هفتگی    125    — ۷ روز   (≈11٪ تخفیف)
+ *   ماهانه   480    — ۳۰ روز  (20٪ تخفیف)
+ *   سالانه  5110    — ۳۶۵ روز (30٪ تخفیف)
+ *   لایف‌تایم 12000  — دائمی   (نشان «بهترین ارزش»)
+ * hours: 0 به‌معنای اعتبار دائمی است.
  */
-export const DAILY_BASE = 10;
+export const DAILY_BASE = 20;
 
 export const PLANS: Plan[] = [
-  { id: "signup", price: "10", hours: 24, tier: 1 },
-  { id: "signal", price: "20", hours: 24, tier: 2 },
-  { id: "week", price: "126", hours: 24 * 7, tier: 2, discount: 10, subscription: true },
-  { id: "month", price: "480", hours: 24 * 30, tier: 2, discount: 20, subscription: true, popular: true },
+  { id: "signup", price: "10", hours: 0, tier: 1 },
+  { id: "signal", price: "20", hours: 24, tier: 2, popular: true },
+  { id: "week", price: "125", hours: 24 * 7, tier: 2, discount: 11, subscription: true },
+  { id: "month", price: "480", hours: 24 * 30, tier: 2, discount: 20, subscription: true },
   { id: "year", price: "5110", hours: 24 * 365, tier: 2, discount: 30, subscription: true },
+  { id: "lifetime", price: "12000", hours: 0, tier: 2, subscription: true },
 ];
+
+/** آیا تعرفه اعتبار دائمی دارد؟ */
+export const isPermanent = (p: Plan) => p.hours === 0;
 
 export const planById = (id: PlanId): Plan => PLANS.find((p) => p.id === id)!;
 
