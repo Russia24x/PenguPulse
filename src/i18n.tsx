@@ -22,6 +22,7 @@ export interface Dict {
     connecting: string;
     loginHint: string;
     loginError: string;
+    openNewTab: string;
     balance: string;
     engine: string;
     data: string;
@@ -248,6 +249,7 @@ const fa: Dict = {
     connecting: "در حال ورود…",
     loginHint: "بدون نصب افزونه — با ایمیل، QR یا اکانت اجتماعی",
     loginError: "ورود ناموفق بود؛ دوباره تلاش کنید",
+    openNewTab: "بازکردن در پنجرهٔ جدید",
     balance: "موجودی",
     engine: "موتور",
     data: "داده",
@@ -499,6 +501,7 @@ const en: Dict = {
     connecting: "Signing in…",
     loginHint: "No extension needed — email, QR code, or social login",
     loginError: "Sign-in failed; please try again",
+    openNewTab: "Open in a new window",
     balance: "Balance",
     engine: "Engine",
     data: "Data",

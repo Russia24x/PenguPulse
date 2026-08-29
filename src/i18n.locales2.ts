@@ -13,7 +13,7 @@ export const ko: Dict = {
   status: {
     live: "라이브", refresh: "새로고침", block: "블록", onAbstract: "Abstract 위",
     connectWallet: "Abstract로 로그인", disconnect: "연결 해제", connected: "연결됨", connecting: "로그인 중…",
-    loginHint: "확장 프로그램 불필요 — 이메일, QR 코드 또는 소셜 계정", loginError: "로그인 실패; 다시 시도하세요",
+    loginHint: "확장 프로그램 불필요 — 이메일, QR 코드 또는 소셜 계정", loginError: "로그인 실패; 다시 시도하세요", openNewTab: "새 창에서 열기",
     balance: "잔액", engine: "엔진", data: "데이터", offline: "오프라인 캐시",
     loadingMarket: "실시간 시장 데이터 가져오는 중…", marketError: "시장 데이터 실패", retry: "재시도", langToggle: "언어",
   },
@@ -146,7 +146,7 @@ export const de: Dict = {
   status: {
     live: "LIVE", refresh: "Aktualisieren", block: "Block", onAbstract: "auf Abstract",
     connectWallet: "Mit Abstract anmelden", disconnect: "Trennen", connected: "Verbunden", connecting: "Anmeldung läuft…",
-    loginHint: "Keine Erweiterung nötig — E-Mail, QR-Code oder Social-Konto", loginError: "Anmeldung fehlgeschlagen; bitte erneut versuchen",
+    loginHint: "Keine Erweiterung nötig — E-Mail, QR-Code oder Social-Konto", loginError: "Anmeldung fehlgeschlagen; bitte erneut versuchen", openNewTab: "In neuem Fenster öffnen",
     balance: "Guthaben", engine: "Engine", data: "Daten", offline: "Offline-Cache",
     loadingMarket: "Lade Live-Marktdaten…", marketError: "Marktdaten fehlgeschlagen", retry: "Erneut versuchen", langToggle: "Sprache",
   },

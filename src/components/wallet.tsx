@@ -156,18 +156,35 @@ export function WalletButton({ wallet, notify }: { wallet: WalletApi; notify: (m
 /* -------------------------------- AgwGate ------------------------------- */
 export function AgwGate({ wallet }: { wallet: WalletApi }) {
   const { t } = useI18n();
+  const [stuck, setStuck] = useState(false);
   const reasons = [
     { icon: <IcWallet size={16} />, text: t.terminal.why1 },
     { icon: <IcBolt size={16} />, text: t.terminal.why2 },
     { icon: <IcChain size={16} />, text: t.terminal.why3 },
   ];
+
+  // اگر پنجرهٔ ورود باز نشد یا دکمه‌هایش پاسخ ندادند، بعد از ۱۲ ثانیه راهنما نشان بده
+  useEffect(() => {
+    if (wallet.status !== "connecting") {
+      setStuck(false);
+      return;
+    }
+    const timer = setTimeout(() => setStuck(true), 12_000);
+    return () => clearTimeout(timer);
+  }, [wallet.status]);
+
+  const tryConnect = () => {
+    setStuck(false);
+    wallet.connect();
+  };
+
   return (
     <div className="relative overflow-hidden rounded-2xl border border-ice/35 bg-panel/85 p-6">
       <div className="pointer-events-none absolute -start-10 -top-10 h-36 w-36 rounded-full bg-ice/10 blur-2xl" aria-hidden />
       <p className="font-mono text-[11.5px] tracking-[0.22em] text-ice">▚ {t.terminal.gateTitle}</p>
       <p className="mt-2.5 max-w-md text-[13.5px] leading-7 text-fog">{t.terminal.gateBody}</p>
       <button
-        onClick={() => wallet.connect()}
+        onClick={tryConnect}
         disabled={wallet.status === "connecting"}
         className="btn-press pp-ring mt-5 flex items-center gap-2.5 rounded-xl bg-ice px-6 py-3.5 text-[15px] font-black text-ink hover:bg-frost disabled:opacity-60"
       >
@@ -178,6 +195,20 @@ export function AgwGate({ wallet }: { wallet: WalletApi }) {
         )}
         {wallet.status === "connecting" ? t.status.connecting : t.terminal.gateBtn}
       </button>
+      {stuck && (
+        <div className="mt-3 flex flex-col gap-2 rounded-xl border border-beak/45 bg-beak/8 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[12.5px] leading-5 text-beak">{t.status.loginError}</p>
+          <a
+            href={window.location.href}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => setStuck(false)}
+            className="btn-press shrink-0 rounded-lg bg-beak px-4 py-1.5 text-[12px] font-black text-ink hover:bg-frost"
+          >
+            {t.status.openNewTab}
+          </a>
+        </div>
+      )}
       <ul className="mt-5 space-y-2">
         {reasons.map((r, i) => (
           <li key={i} className="flex items-center gap-2.5 text-[12.5px] text-fog">
