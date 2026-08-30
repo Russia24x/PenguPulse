@@ -239,13 +239,6 @@ body {
   transform: translateX(5px);
 }
 
-/* ---------- locked content ---------- */
-.locked-blur {
-  filter: blur(11px) saturate(0.6);
-  pointer-events: none;
-  user-select: none;
-}
-
 /* ---------- verdict stamp ---------- */
 .stamp {
   border: 3px solid currentColor;
