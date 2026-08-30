@@ -393,7 +393,7 @@ function analyzeCandles(candles: Candle[], label: "4H" | "1D"): TimeframeAnalysi
   return { label, score, indicators: results };
 }
 
-export function analyze(candles4h: Candle[], candles1d: Candle[]): Analysis | null {
+export function analyze(candles4h: Candle[], candles1d: Candle[], dailyOHLC?: Candle[]): Analysis | null {
   if (candles4h.length < 60 || candles1d.length < 40) return null;
   const fast = analyzeCandles(candles4h, "4H");
   const slow = analyzeCandles(candles1d, "1D");
@@ -414,8 +414,10 @@ export function analyze(candles4h: Candle[], candles1d: Candle[]): Analysis | nu
   const e20 = ema(closes1d, ENGINE.periods.emaFast);
   const e50 = ema(closes1d, ENGINE.periods.emaMid);
   const e200 = ema(closes1d, ENGINE.periods.emaSlow);
-  const lastDay = candles1d[candles1d.length - 2] ?? candles1d[candles1d.length - 1];
-  const a14 = atr(candles1d, ENGINE.periods.atr);
+  // OHLC واقعی روزانه (از /ohlc)؛ در نبود آن، کندل‌های روزانهٔ بسته‌شده
+  const src1d = dailyOHLC && dailyOHLC.length >= 40 ? dailyOHLC : candles1d;
+  const lastDay = src1d[src1d.length - 2] ?? src1d[src1d.length - 1];
+  const a14 = atr(src1d, ENGINE.periods.atr);
   const atrNow = a14[a14.length - 1];
   const price = candles4h[candles4h.length - 1].c;
   const sw = swings(candles4h, 5, 4);

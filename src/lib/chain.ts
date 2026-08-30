@@ -175,19 +175,25 @@ interface AnyReceipt {
 /** استخراج و اعتبارسنجی لاگ Transfer PENGU به خزانه از رسید */
 function extractValidTransfer(receipt: AnyReceipt): TransferInfo {
   if (receipt.status !== "success") throw new ChainError("TX_FAILED");
+  let sawToken = false;
+  let lastErr: ChainError | null = null;
   for (const log of receipt.logs) {
     if (getAddress(log.address) !== tokenAddress) continue;
-    try {
-      const decoded = decodeTransferLog(log.topics as [`0x${string}`, `0x${string}`, `0x${string}`], log.data);
-      if (!decoded) continue;
-      if (getAddress(decoded.to) !== treasuryAddress) throw new ChainError("WRONG_RECIPIENT");
-      if (decoded.value < MIN_WEI) throw new ChainError("AMOUNT_TOO_LOW");
-      return decoded;
-    } catch (e) {
-      if (e instanceof ChainError) throw e;
+    sawToken = true;
+    const decoded = decodeTransferLog(log.topics as [`0x${string}`, `0x${string}`, `0x${string}`], log.data);
+    if (!decoded) continue;
+    if (getAddress(decoded.to) !== treasuryAddress) {
+      lastErr = new ChainError("WRONG_RECIPIENT");
+      continue; // لاگ‌های بعدی را هم بررسی کن
     }
+    if (decoded.value < MIN_WEI) {
+      lastErr = new ChainError("AMOUNT_TOO_LOW");
+      continue;
+    }
+    return decoded;
   }
-  throw new ChainError("NOT_PENGU");
+  if (!sawToken) throw new ChainError("NOT_PENGU");
+  throw lastErr ?? new ChainError("NOT_PENGU");
 }
 
 function decodeTransferLog(
