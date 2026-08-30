@@ -26,6 +26,8 @@ export interface MarketBundle {
   snapshot: MarketSnapshot;
   candles4h: Candle[];
   candles1d: Candle[];
+  /** کندل روزانه با high/low واقعی (از تجمیع دادهٔ ساعتی) — پایهٔ Pivot و ATR */
+  dailyOHLC: Candle[];
   dataHash: string;
   fetchedAt: number;
   stale?: boolean;
@@ -139,9 +141,13 @@ export async function fetchMarket(opts: { force?: boolean } = {}): Promise<Marke
     const spot = spotRaw[PENGU.coingeckoId];
     const candles4h = buildCandles(chart30.prices, chart30.total_volumes, 4 * 3_600_000);
     const candles1d = buildCandles(chart365.prices, chart365.total_volumes, 24 * 3_600_000);
+    // کندل روزانه با high/low واقعی: تجمیع دادهٔ ساعتیِ ۳۰روزه (رفع تباهگی h=l=c
+    // که از نمونهٔ تک‌روزانهٔ ۳۶۵روزه می‌آمد و Pivot/ATR را به یک عدد فرومی‌کاست).
+    const dailyOHLC = buildCandles(chart30.prices, chart30.total_volumes, 24 * 3_600_000);
 
-    const sample = chart365.prices.filter((_, i) => i % 7 === 0).map((p) => `${p[0]}:${p[1].toFixed(6)}`).join(",");
-    const dataHash = await sha256Short(`pengu|${candles4h.length}|${candles1d.length}|${sample}`);
+    const s365 = chart365.prices.filter((_, i) => i % 7 === 0).map((p) => `${p[0]}:${p[1].toFixed(6)}`).join(",");
+    const s30 = chart30.prices.filter((_, i) => i % 11 === 0).map((p) => `${p[0]}:${p[1].toFixed(6)}`).join(",");
+    const dataHash = await sha256Short(`pengu|${candles4h.length}|${candles1d.length}|${dailyOHLC.length}|${s30}|${s365}`);
 
     const bundle: MarketBundle = {
       snapshot: {
@@ -156,6 +162,7 @@ export async function fetchMarket(opts: { force?: boolean } = {}): Promise<Marke
       },
       candles4h,
       candles1d,
+      dailyOHLC,
       dataHash,
       fetchedAt: Date.now(),
     };

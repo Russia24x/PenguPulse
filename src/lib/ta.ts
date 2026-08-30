@@ -151,8 +151,8 @@ export function atr(candles: Candle[], period = 14): number[] {
             Math.abs(candles[i].l - candles[i - 1].c),
           );
     trs.push(tr);
-    if (i === period) out[i] = trs.slice(0, period + 1).reduce((a, b) => a + b, 0) / period;
-    else if (i > period) out[i] = (out[i - 1] * (period - 1) + tr) / period;
+    if (i === period - 1) out[i] = trs.slice(0, period).reduce((a, b) => a + b, 0) / period;
+    else if (i >= period) out[i] = (out[i - 1] * (period - 1) + tr) / period;
   }
   return out;
 }
