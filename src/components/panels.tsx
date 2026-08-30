@@ -371,4 +371,6 @@ export const planName = (t: Dict, id: string) =>
         ? t.plans.week
         : id === "month"
           ? t.plans.month
-          : t.plans.year;
+          : id === "year"
+            ? t.plans.year
+            : t.plans.lifetime;

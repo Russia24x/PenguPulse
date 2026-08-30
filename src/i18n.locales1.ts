@@ -48,7 +48,7 @@ export const es: Dict = {
   plans: {
     title: "Precios — paga en PENGU, en Abstract",
     body: "Cada pago es una transferencia ERC-20 en Abstract al tesoro público del proyecto; el recibo se verifica on-chain al instante y desbloquea el acceso hasta su vencimiento.",
-    signup: "Registro", signupDesc: "Terminal de mercado sin señales — 24 horas",
+    signup: "Registro", signupDesc: "Terminal de mercado sin señales — acceso permanente",
     signal: "Señal de hoy", signalDesc: "Acceso de 24 h a la señal diaria completa",
     week: "Plan semanal", weekDesc: "7 días de acceso completo + recordatorio",
     month: "Plan mensual", monthDesc: "30 días de acceso completo + recordatorio",
@@ -185,7 +185,7 @@ export const hi: Dict = {
   plans: {
     title: "मूल्य — Abstract पर PENGU में भुगतान",
     body: "हर भुगतान परियोजना के सार्वजनिक खज़ाने को Abstract पर ERC-20 ट्रांसफ़र है; रसीद उसी क्षण ऑन-चेन सत्यापित होती है और समाप्ति तक एक्सेस खोलती है।",
-    signup: "पंजीकरण", signupDesc: "बिना सिग्नल मार्केट टर्मिनल — 24 घंटे",
+    signup: "पंजीकरण", signupDesc: "बिना सिग्नल मार्केट टर्मिनल — स्थायी एक्सेस",
     signal: "आज का सिग्नल", signalDesc: "दैनिक सिग्नल की 24 घंटे की एक्सेस",
     week: "साप्ताहिक योजना", weekDesc: "7 दिन पूर्ण एक्सेस + नवीनीकरण रिमाइंडर",
     month: "मासिक योजना", monthDesc: "30 दिन पूर्ण एक्सेस + रिमाइंडर",
@@ -322,7 +322,7 @@ export const zh: Dict = {
   plans: {
     title: "价格 — 在 Abstract 上以 PENGU 支付",
     body: "每笔付款都是发往项目公开金库的 ERC-20 转账；回执在到账瞬间经链上验证，并解锁访问直至到期。",
-    signup: "注册", signupDesc: "无信号行情终端 — 24 小时",
+    signup: "注册", signupDesc: "无信号行情终端 — 永久访问",
     signal: "今日信号", signalDesc: "24 小时每日信号访问",
     week: "每周计划", weekDesc: "7 天完整访问 + 续订提醒",
     month: "每月计划", monthDesc: "30 天完整访问 + 提醒",
@@ -459,7 +459,7 @@ export const ja: Dict = {
   plans: {
     title: "料金 — Abstract 上で PENGU 払い",
     body: "すべての支払いはプロジェクト公開トレジャリーへの ERC-20 送金です。レシートは着金と同時にオンチェーン検証され、期限までアクセスを解除します。",
-    signup: "登録", signupDesc: "シグナルなしマーケットターミナル — 24時間",
+    signup: "登録", signupDesc: "シグナルなしマーケットターミナル — 永久アクセス",
     signal: "今日のシグナル", signalDesc: "毎日シグナルへの 24 時間アクセス",
     week: "週間プラン", weekDesc: "7日間のフルアクセス + 更新リマインダー",
     month: "月間プラン", monthDesc: "30日間のフルアクセス + リマインダー",

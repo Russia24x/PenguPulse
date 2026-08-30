@@ -47,7 +47,7 @@ export const ko: Dict = {
   plans: {
     title: "요금 — Abstract에서 PENGU로 결제",
     body: "모든 결제는 프로젝트 공개 금고로의 ERC-20 전송입니다. 영수증은 도착 즉시 온체인 검증되어 만료 시까지 액세스를 잠금 해제합니다.",
-    signup: "가입", signupDesc: "시그널 없는 마켓 터미널 — 24시간",
+    signup: "가입", signupDesc: "시그널 없는 마켓 터미널 — 영구 액세스",
     signal: "오늘의 시그널", signalDesc: "일간 시그널 24시간 액세스",
     week: "주간 플랜", weekDesc: "7일 전체 액세스 + 갱신 알림",
     month: "월간 플랜", monthDesc: "30일 전체 액세스 + 알림",
@@ -184,7 +184,7 @@ export const de: Dict = {
   plans: {
     title: "Preise — in PENGU zahlen, auf Abstract",
     body: "Jede Zahlung ist ein ERC-20-Transfer an die öffentliche Projektkasse auf Abstract; der Beleg wird im Moment des Eingangs on-chain verifiziert und schaltet den Zugang bis zum Ablauf frei.",
-    signup: "Registrierung", signupDesc: "Marktterminal ohne Signale — 24 Stunden",
+    signup: "Registrierung", signupDesc: "Marktterminal ohne Signale — dauerhafter Zugang",
     signal: "Heutiges Signal", signalDesc: "24 h Zugang zum täglichen Signal",
     week: "Wochenplan", weekDesc: "7 Tage Vollzugang + Verlängerungserinnerung",
     month: "Monatsplan", monthDesc: "30 Tage Vollzugang + Erinnerung",

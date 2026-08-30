@@ -47,7 +47,7 @@ export const fr: Dict = {
   plans: {
     title: "Tarifs — payez en PENGU, sur Abstract",
     body: "Chaque paiement est un transfert ERC-20 vers le trésor public du projet sur Abstract ; le reçu est vérifié on-chain à l'arrivée et débloque l'accès jusqu'à expiration.",
-    signup: "Inscription", signupDesc: "Terminal de marché sans signaux — 24 h",
+    signup: "Inscription", signupDesc: "Terminal de marché sans signaux — accès permanent",
     signal: "Signal du jour", signalDesc: "Accès 24 h au signal quotidien",
     week: "Plan hebdo", weekDesc: "7 jours d'accès complet + rappel de renouvellement",
     month: "Plan mensuel", monthDesc: "30 jours d'accès complet + rappel",
@@ -184,7 +184,7 @@ export const ru: Dict = {
   plans: {
     title: "Тарифы — оплата в PENGU на Abstract",
     body: "Каждый платёж — это ERC-20-перевод в публичную казну проекта на Abstract; квитанция верифицируется ончейн в момент подтверждения и открывает доступ до истечения срока.",
-    signup: "Регистрация", signupDesc: "Рыночный терминал без сигналов — 24 часа",
+    signup: "Регистрация", signupDesc: "Рыночный терминал без сигналов — постоянный доступ",
     signal: "Сигнал на сегодня", signalDesc: "24 часа доступа к дневному сигналу",
     week: "Недельный план", weekDesc: "7 дней полного доступа + напоминание",
     month: "Месячный план", monthDesc: "30 дней полного доступа + напоминание",

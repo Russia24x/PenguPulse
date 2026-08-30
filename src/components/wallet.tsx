@@ -8,7 +8,7 @@
  * توسط Paymaster شبکهٔ Abstract اسپانسر می‌شود.
  */
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import { ABSTRACT, PENGU, PLANS, TREASURY, fmt, planById, type Plan, type PlanId } from "../config";
+import { ABSTRACT, ECOSYSTEM, PENGU, PLANS, TREASURY, fmt, planById, type Plan, type PlanId } from "../config";
 import { useI18n } from "../i18n";
 import {
   ChainError,
@@ -16,8 +16,10 @@ import {
   explorerAddr,
   explorerTx,
   fetchPenguBalance,
+  fetchPortalProfile,
   fetchTreasuryFeed,
   readAutoRenew,
+  type PortalProfile,
   saveGrantFor,
   sendPaymentViaAgw,
   type TreasuryInflow,
@@ -477,12 +479,17 @@ export function PlansPanel({
                       ? t.plans.weekDesc
                       : p.id === "month"
                         ? t.plans.monthDesc
-                        : t.plans.yearDesc;
+                        : p.id === "year"
+                          ? t.plans.yearDesc
+                          : t.plans.lifetimeDesc;
               const active = access?.planId === p.id;
               return (
                 <div key={p.id} className="plan-row relative rounded-xl border border-line bg-panel/70 p-4 sm:p-5" style={{ transitionDelay: `${i * 30}ms` }}>
                   {p.popular && p.id !== "signal" && (
                     <span className="absolute -top-2.5 end-5 rounded-md bg-ice px-2 py-0.5 text-[10.5px] font-black text-ink">{t.plans.popular}</span>
+                  )}
+                  {p.id === "signup" && (
+                    <span className="absolute -top-2.5 end-5 rounded-md bg-beak px-2 py-0.5 text-[10.5px] font-black text-ink">{t.plans.required}</span>
                   )}
                   {p.subscription && (
                     <span className="absolute -top-2.5 end-5 rounded-md bg-ice/90 px-2 py-0.5 text-[10.5px] font-black text-ink">{t.plans.subscription}</span>
