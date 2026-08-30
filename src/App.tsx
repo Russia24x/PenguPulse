@@ -156,7 +156,10 @@ function AppInner() {
   }, []);
 
   const analysis = useMemo(
-    () => (market.bundle ? analyze(market.bundle.candles4h, market.bundle.candles1d) : null),
+    () =>
+      market.bundle
+        ? analyze(market.bundle.candles4h, market.bundle.candles1d, market.bundle.dailyOHLC)
+        : null,
     [market.bundle],
   );
 
