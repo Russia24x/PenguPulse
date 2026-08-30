@@ -66,17 +66,23 @@ function VoteBar({ vote, delay }: { vote: number; delay: number }) {
   );
 }
 
-function TfVoteBoard({ tf, t, limit }: { tf: TimeframeAnalysis; t: Dict; limit?: number }) {
+function TfVoteBoard({ tf, t, limit, redacted }: { tf: TimeframeAnalysis; t: Dict; limit?: number; redacted?: boolean }) {
   const rows = limit ? tf.indicators.slice(0, limit) : tf.indicators;
   const weightSum = rows.reduce((s, r) => s + r.weight, 0);
   return (
     <div className="overflow-hidden rounded-xl border border-line bg-panel/70">
       <div className="flex items-center justify-between border-b border-line px-4 py-3">
         <span className="font-mono text-sm font-semibold text-ice">{tf.label}</span>
-        <span className="font-mono text-[12px] text-fog">
-          {t.indicators.score}: <b className={tf.score >= 0 ? "text-gain" : "text-loss"}>{tf.score >= 0 ? "+" : ""}{tf.score.toFixed(1)}</b>
-          <span className="ms-2 text-faint">Σw = {weightSum}</span>
-        </span>
+        {redacted ? (
+          <span className="flex items-center gap-1.5 font-mono text-[12px] text-faint">
+            <IcLock size={13} /> {t.indicators.score}: <b className="text-faint">–––</b>
+          </span>
+        ) : (
+          <span className="font-mono text-[12px] text-fog">
+            {t.indicators.score}: <b className={tf.score >= 0 ? "text-gain" : "text-loss"}>{tf.score >= 0 ? "+" : ""}{tf.score.toFixed(1)}</b>
+            <span className="ms-2 text-faint">Σw = {weightSum}</span>
+          </span>
+        )}
       </div>
       <ul>
         {rows.map((r, i) => (
@@ -84,15 +90,23 @@ function TfVoteBoard({ tf, t, limit }: { tf: TimeframeAnalysis; t: Dict; limit?:
             <div className="flex items-center justify-between gap-3">
               <p className="text-[13.5px] font-semibold text-snow">
                 {t.indicators[r.key]}
-                <span className="ms-2 text-[11.5px] font-normal text-faint">{t.indicators[noteKey(r.note)]}</span>
+                {!redacted && (
+                  <span className="ms-2 text-[11.5px] font-normal text-faint">{t.indicators[noteKey(r.note)]}</span>
+                )}
               </p>
-              <span className={`shrink-0 rounded-md border px-2.5 py-0.5 text-[11.5px] font-bold ${readingTone(r.reading)}`}>
-                {r.reading === "buy" ? t.indicators.buy : r.reading === "sell" ? t.indicators.sell : t.indicators.neutral}
-              </span>
+              {redacted ? (
+                <span className="shrink-0 rounded-md border border-line px-2.5 py-0.5 text-[11.5px] font-bold text-faint">–</span>
+              ) : (
+                <span className={`shrink-0 rounded-md border px-2.5 py-0.5 text-[11.5px] font-bold ${readingTone(r.reading)}`}>
+                  {r.reading === "buy" ? t.indicators.buy : r.reading === "sell" ? t.indicators.sell : t.indicators.neutral}
+                </span>
+              )}
             </div>
             <div className="mt-2.5 flex items-center gap-3">
-              <span className="w-20 shrink-0 font-mono text-[12px] text-fog tabular" dir="ltr">{r.display}</span>
-              <VoteBar vote={r.vote} delay={120 + i * 70} />
+              <span className="w-20 shrink-0 font-mono text-[12px] text-fog tabular" dir="ltr">
+                {redacted ? "–––––" : r.display}
+              </span>
+              <VoteBar vote={redacted ? 0 : r.vote} delay={120 + i * 70} />
               <span className="w-9 shrink-0 text-end font-mono text-[11px] text-faint tabular" dir="ltr">w{r.weight}</span>
             </div>
           </li>
@@ -128,9 +142,7 @@ export function IndicatorPanel({ analysis, tier }: { analysis: Analysis | null; 
     <Section id="indicators" num="01" kicker="SIGNAL ENGINE" title={t.indicators.title} body={t.indicators.body} icon={<IcGauge size={30} />}>
       <div className="grid gap-5 lg:grid-cols-2">
         <Reveal delay={0}>
-          <div className={tier === 0 ? "locked-blur" : ""}>
-            <TfVoteBoard tf={fast} t={t} limit={tier === 1 ? 5 : undefined} />
-          </div>
+          <TfVoteBoard tf={fast} t={t} limit={tier === 1 ? 5 : undefined} redacted={tier === 0} />
         </Reveal>
         <Reveal delay={120}>
           {tier === 2 ? (
@@ -172,44 +184,48 @@ export function RiskPanel({ analysis, tier }: { analysis: Analysis | null; tier:
     <section className="mx-auto w-full max-w-6xl px-4 pb-16">
       <div className="grid gap-5 lg:grid-cols-3">
         <Reveal className="lg:col-span-2">
-          <div className={tier === 0 ? "locked-blur" : ""}>
-            <div className="h-full rounded-xl border border-line bg-panel/70 p-5">
-              <h3 className="mb-1 flex items-center gap-2 font-display text-xl text-snow">
-                <IcCompass size={22} className="text-ice" /> {t.risk.pivots}
-              </h3>
-              <p className="mb-4 text-[12.5px] text-faint">{t.risk.pivots} · {t.risk.swings}</p>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {levels.map((l) => (
-                  <div key={l.k} className="rounded-lg border border-line/70 bg-ink/60 px-3 py-2.5 transition-transform hover:-translate-y-0.5">
-                    <p className={`font-mono text-[11px] ${l.tone === "gain" ? "text-gain" : l.tone === "loss" ? "text-loss" : "text-ice"}`}>{l.k}</p>
-                    <p className="font-mono text-[13.5px] font-semibold text-snow tabular" dir="ltr">{l.v.toFixed(6)}</p>
-                  </div>
-                ))}
-                <div className="rounded-lg border border-beak/40 bg-beak/8 px-3 py-2.5">
-                  <p className="font-mono text-[11px] text-beak">{t.risk.atr}</p>
-                  <p className="font-mono text-[13.5px] font-semibold text-snow tabular">{analysis.atrPct.toFixed(2)}%</p>
+          <div className="h-full rounded-xl border border-line bg-panel/70 p-5">
+            <h3 className="mb-1 flex items-center gap-2 font-display text-xl text-snow">
+              <IcCompass size={22} className="text-ice" /> {t.risk.pivots}
+              {tier === 0 && <IcLock size={15} className="text-faint" />}
+            </h3>
+            <p className="mb-4 text-[12.5px] text-faint">{t.risk.pivots} · {t.risk.swings}</p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {levels.map((l) => (
+                <div key={l.k} className="rounded-lg border border-line/70 bg-ink/60 px-3 py-2.5 transition-transform hover:-translate-y-0.5">
+                  <p className={`font-mono text-[11px] ${l.tone === "gain" ? "text-gain" : l.tone === "loss" ? "text-loss" : "text-ice"}`}>{l.k}</p>
+                  <p className="font-mono text-[13.5px] font-semibold text-snow tabular" dir="ltr">
+                    {tier === 0 ? "––––––" : l.v.toFixed(6)}
+                  </p>
                 </div>
+              ))}
+              <div className="rounded-lg border border-beak/40 bg-beak/8 px-3 py-2.5">
+                <p className="font-mono text-[11px] text-beak">{t.risk.atr}</p>
+                <p className="font-mono text-[13.5px] font-semibold text-snow tabular">
+                  {tier === 0 ? "–––" : `${analysis.atrPct.toFixed(2)}%`}
+                </p>
               </div>
             </div>
           </div>
         </Reveal>
         <Reveal delay={120}>
-          <div className={`h-full rounded-xl border border-line bg-panel/70 p-5 ${tier < 2 ? "locked-blur" : ""}`}>
+          <div className="h-full rounded-xl border border-line bg-panel/70 p-5">
             <h3 className="mb-3 flex items-center gap-2 font-display text-xl text-snow">
               <IcShield size={22} className="text-beak" /> {t.risk.title}
+              {tier < 2 && <IcLock size={15} className="text-faint" />}
             </h3>
             <div className="space-y-2.5 font-mono text-[13px]" dir="ltr">
               <div className="flex items-center justify-between rounded-lg bg-ink/60 px-3 py-2.5">
                 <span className="text-fog">{t.risk.longStop}</span>
-                <span className="font-semibold text-gain tabular">{stopLong.toFixed(6)}</span>
+                <span className="font-semibold text-gain tabular">{tier < 2 ? "––––––" : stopLong.toFixed(6)}</span>
               </div>
               <div className="flex items-center justify-between rounded-lg bg-ink/60 px-3 py-2.5">
                 <span className="text-fog">{t.risk.shortStop}</span>
-                <span className="font-semibold text-loss tabular">{stopShort.toFixed(6)}</span>
+                <span className="font-semibold text-loss tabular">{tier < 2 ? "––––––" : stopShort.toFixed(6)}</span>
               </div>
               <div className="flex items-center justify-between rounded-lg bg-ink/60 px-3 py-2.5">
                 <span className="text-fog">1.5×ATR</span>
-                <span className="text-ice tabular">±{((1.5 * analysis.atrPct) / 1).toFixed(2)}%</span>
+                <span className="text-ice tabular">{tier < 2 ? "–––" : `±${(1.5 * analysis.atrPct).toFixed(2)}%`}</span>
               </div>
             </div>
             <p className="mt-4 text-[12px] leading-6 text-faint">{t.risk.note}</p>

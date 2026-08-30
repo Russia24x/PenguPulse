@@ -113,7 +113,7 @@ export function SignalGauge({ score, locked }: { score: number; locked: boolean 
   const needleDeg = locked ? 0 : (Math.max(-100, Math.min(100, shown)) / 100) * 90;
 
   return (
-    <div className={`relative ${locked ? "locked-blur" : ""}`}>
+    <div className="relative">
       <svg viewBox="0 0 220 128" className="w-full max-w-[340px]">
         {zones.map((z, i) => (
           <path
